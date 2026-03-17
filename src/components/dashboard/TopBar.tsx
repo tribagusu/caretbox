@@ -1,12 +1,30 @@
-import { Search } from "lucide-react";
+"use client";
+
+import { Search, Plus, PanelLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { useSidebar } from "@/components/dashboard/SidebarContext";
 
 export function TopBar() {
+  const { toggleSidebar, openMobile } = useSidebar();
+
   return (
     <header className="flex h-14 items-center justify-between border-b border-border px-4">
       <div className="flex items-center gap-3">
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          onClick={() => {
+            if (window.innerWidth < 768) {
+              openMobile();
+            } else {
+              toggleSidebar();
+            }
+          }}
+          className="text-muted-foreground"
+        >
+          <PanelLeft className="h-4 w-4" />
+        </Button>
         <div className="flex items-center gap-2">
           <div className="flex h-7 w-7 items-center justify-center rounded-md bg-blue-600 text-xs font-bold text-white">
             D
