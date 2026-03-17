@@ -2,7 +2,17 @@
 
 ## Status
 
+In Progress
+
 ## Goals
+
+Dashboard UI Phase 3 — Main content area with:
+- 4 stats cards (items, collections, favorite items, favorite collections)
+- Recent collections
+- Pinned items
+- 10 recent items
+
+See @context/features/dashboard-phase-3-spec.md for full spec.
 
 ## Notes
 
