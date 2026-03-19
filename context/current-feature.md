@@ -10,6 +10,8 @@ Completed
 
 ## History
 
+- **2026-03-19** — Seed Demo Data: Full seed script with demo user (demo@devstash.io, bcryptjs hashed password), 7 system item types (Lucide icons, updated colors), 18 tags, 5 collections (React Patterns, AI Workflows, DevOps, Terminal Commands, Design Resources), and 18 items (snippets, prompts, commands, links) with favorites, pins, and tag assignments. Cleaned up old duplicate item types. Updated test-db script to display all seeded data.
+
 - **2026-03-18** — Prisma + Neon PostgreSQL Setup: Prisma 7 ORM with Neon PostgreSQL (serverless), driver adapter pattern (@prisma/adapter-pg), full schema with app models (User, Item, ItemType, Collection, Tag, ItemTag) and NextAuth models (Account, Session, VerificationToken), indexes, cascade deletes, snake_case table/column naming via @@map/@map, seed script for 7 system item types, prisma.config.ts, PrismaClient singleton, npm scripts for all db commands.
 
 - **2026-03-17** — Dashboard UI Phase 3: Main content area with 4 stats cards (items, collections, favorite items, favorite collections), collections grid with favorite stars and type icons, pinned items section, and 10 recent items list with tags and dates.
