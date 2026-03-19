@@ -1,14 +1,21 @@
 import { Star, MoreHorizontal } from "lucide-react";
 import { getIcon } from "@/lib/icons";
-import type { Collection } from "@/lib/mock-data";
+import type { DashboardCollection } from "@/lib/db/collections";
 
 interface CollectionCardProps {
-  collection: Collection;
+  collection: DashboardCollection;
 }
 
 export function CollectionCard({ collection }: CollectionCardProps) {
   return (
-    <div className="group rounded-xl border border-border bg-card p-4 transition-colors hover:border-muted-foreground/30">
+    <div
+      className="group rounded-xl border border-border bg-card p-4 transition-colors hover:border-muted-foreground/30"
+      style={
+        collection.dominantColor
+          ? { borderColor: `${collection.dominantColor}33` }
+          : undefined
+      }
+    >
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-2">
           <h3 className="font-semibold">{collection.name}</h3>

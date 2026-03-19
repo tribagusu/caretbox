@@ -6,6 +6,7 @@ import {
   File,
   Image,
   Link,
+  StickyNote,
   type LucideIcon,
 } from "lucide-react";
 
@@ -14,11 +15,12 @@ const iconMap: Record<string, LucideIcon> = {
   sparkles: Sparkles,
   terminal: Terminal,
   "file-text": FileText,
+  stickynote: StickyNote,
   file: File,
   image: Image,
   link: Link,
 };
 
 export function getIcon(name: string): LucideIcon {
-  return iconMap[name] ?? File;
+  return iconMap[name.toLowerCase()] ?? File;
 }

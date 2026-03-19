@@ -1,10 +1,16 @@
 import { Pin } from "lucide-react";
-import { items, collections } from "@/lib/mock-data";
+import { items } from "@/lib/mock-data";
+import { getRecentCollections, getCollectionStats } from "@/lib/db/collections";
 import { StatsCards } from "@/components/dashboard/StatsCards";
 import { CollectionCard } from "@/components/dashboard/CollectionCard";
 import { ItemRow } from "@/components/dashboard/ItemRow";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const [collections, collectionStats] = await Promise.all([
+    getRecentCollections(6),
+    getCollectionStats(),
+  ]);
+
   const pinnedItems = items.filter((item) => item.isPinned);
   const recentItems = items
     .slice()
@@ -21,7 +27,11 @@ export default function DashboardPage() {
         <p className="text-muted-foreground">Your developer knowledge hub</p>
       </div>
 
-      <StatsCards items={items} collections={collections} />
+      <StatsCards
+        items={items}
+        totalCollections={collectionStats.totalCollections}
+        favoriteCollections={collectionStats.favoriteCollections}
+      />
 
       <section>
         <div className="mb-4 flex items-center justify-between">
