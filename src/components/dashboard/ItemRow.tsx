@@ -1,25 +1,24 @@
 import { Star, Pin } from "lucide-react";
 import { getIcon } from "@/lib/icons";
-import { itemTypes } from "@/lib/mock-data";
-import type { Item } from "@/lib/mock-data";
+import type { DashboardItem } from "@/lib/db/items";
 
 interface ItemRowProps {
-  item: Item;
+  item: DashboardItem;
 }
 
 export function ItemRow({ item }: ItemRowProps) {
-  const itemType = itemTypes.find((t) => t.id === item.typeId);
-  const TypeIcon = getIcon(itemType?.icon ?? "file");
+  const TypeIcon = getIcon(item.type.icon ?? "file");
+  const color = item.type.color ?? "#6366f1";
 
   return (
     <div className="flex items-center gap-3 rounded-lg border border-border bg-card px-4 py-3 transition-colors hover:border-muted-foreground/30">
       <div
         className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
-        style={{ backgroundColor: `${itemType?.color ?? "#6366f1"}20` }}
+        style={{ backgroundColor: `${color}20` }}
       >
         <TypeIcon
           className="h-4 w-4"
-          style={{ color: itemType?.color ?? "#6366f1" }}
+          style={{ color }}
         />
       </div>
 

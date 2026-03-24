@@ -10,6 +10,8 @@ Completed
 
 ## History
 
+- **2026-03-24** — Dashboard Items from DB: Replaced mock item data with real Prisma queries. Created src/lib/db/items.ts with getPinnedItems(), getRecentItems(), and getItemStats(). Updated ItemRow to use DashboardItem type with icon/border color derived from item type. Updated StatsCards to accept numeric props instead of mock Item[]. Dashboard page fetches all data in parallel via Promise.all. Pinned section hidden when no pinned items exist. Mock-data dependency fully removed from dashboard.
+
 - **2026-03-19** — Dashboard Collections from DB: Replaced mock collection data with real Prisma queries from Neon PostgreSQL. Created src/lib/db/collections.ts with getRecentCollections() and getCollectionStats() functions. Dashboard page is now an async server component fetching collections directly. Collection card border color derived from most-used content type. Type icons shown per collection (normalized PascalCase DB icons to lowercase for icon map). Updated StatsCards to accept DB-driven collection counts. Updated icon map to handle StickyNote and case-insensitive lookups.
 
 - **2026-03-19** — Seed Demo Data: Full seed script with demo user (demo@devstash.io, bcryptjs hashed password), 7 system item types (Lucide icons, updated colors), 18 tags, 5 collections (React Patterns, AI Workflows, DevOps, Terminal Commands, Design Resources), and 18 items (snippets, prompts, commands, links) with favorites, pins, and tag assignments. Cleaned up old duplicate item types. Updated test-db script to display all seeded data.
