@@ -6,10 +6,10 @@ import { usePathname } from "next/navigation";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getIcon } from "@/lib/icons";
-import type { ItemType } from "@/lib/mock-data";
+import type { SidebarItemType } from "@/lib/db/items";
 
 interface SidebarTypesProps {
-  itemTypes: ItemType[];
+  itemTypes: SidebarItemType[];
 }
 
 export function SidebarTypes({ itemTypes }: SidebarTypesProps) {
@@ -34,7 +34,7 @@ export function SidebarTypes({ itemTypes }: SidebarTypesProps) {
       {isOpen && (
         <nav className="mt-1 flex flex-col gap-0.5">
           {itemTypes.map((type) => {
-            const Icon = getIcon(type.icon);
+            const Icon = getIcon(type.icon ?? "file");
             const href = `/items/${type.name.toLowerCase()}`;
             const isActive = pathname === href;
 
@@ -50,7 +50,7 @@ export function SidebarTypes({ itemTypes }: SidebarTypesProps) {
                 )}
               >
                 <span className="flex items-center gap-2">
-                  <Icon className="h-4 w-4" style={{ color: type.color }} />
+                  <Icon className="h-4 w-4" style={{ color: type.color ?? undefined }} />
                   {type.name}
                 </span>
                 <span className="text-xs text-muted-foreground">{type.count}</span>

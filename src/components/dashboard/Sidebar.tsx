@@ -6,9 +6,16 @@ import { SidebarTypes } from "@/components/dashboard/sidebar/SidebarTypes";
 import { SidebarCollections } from "@/components/dashboard/sidebar/SidebarCollections";
 import { SidebarUser } from "@/components/dashboard/sidebar/SidebarUser";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
-import { itemTypes, collections, currentUser } from "@/lib/mock-data";
+import { currentUser } from "@/lib/mock-data";
+import type { SidebarItemType } from "@/lib/db/items";
+import type { DashboardCollection } from "@/lib/db/collections";
 
-function SidebarContent() {
+interface SidebarProps {
+  itemTypes: SidebarItemType[];
+  collections: DashboardCollection[];
+}
+
+function SidebarContent({ itemTypes, collections }: SidebarProps) {
   return (
     <>
       <div className="flex flex-1 flex-col gap-4 overflow-y-auto px-2 py-3">
@@ -22,7 +29,7 @@ function SidebarContent() {
   );
 }
 
-export function Sidebar() {
+export function Sidebar({ itemTypes, collections }: SidebarProps) {
   const { isCollapsed, isMobileOpen, closeMobile } = useSidebar();
 
   return (
@@ -35,7 +42,7 @@ export function Sidebar() {
         )}
       >
         <div className="flex h-full flex-col overflow-hidden whitespace-nowrap">
-          <SidebarContent />
+          <SidebarContent itemTypes={itemTypes} collections={collections} />
         </div>
       </aside>
 
@@ -48,7 +55,7 @@ export function Sidebar() {
         >
           <SheetTitle className="sr-only">Navigation</SheetTitle>
           <div className="flex h-full flex-col">
-            <SidebarContent />
+            <SidebarContent itemTypes={itemTypes} collections={collections} />
           </div>
         </SheetContent>
       </Sheet>
