@@ -10,6 +10,8 @@ Completed
 
 ## History
 
+- **2026-03-24** — Stats & Sidebar from DB: Added getSystemItemTypes() to src/lib/db/items.ts with per-user item counts. Made dashboard layout async to fetch sidebar data from DB. Removed mock-data dependency from Sidebar, DashboardShell, SidebarTypes, and SidebarCollections. Sidebar now shows system item types with icons/counts from DB. Collections sidebar shows favorites with star icons and recent (non-favorite) collections with a colored circle based on dominant item type. Added "View all collections →" link to /collections.
+
 - **2026-03-24** — Dashboard Items from DB: Replaced mock item data with real Prisma queries. Created src/lib/db/items.ts with getPinnedItems(), getRecentItems(), and getItemStats(). Updated ItemRow to use DashboardItem type with icon/border color derived from item type. Updated StatsCards to accept numeric props instead of mock Item[]. Dashboard page fetches all data in parallel via Promise.all. Pinned section hidden when no pinned items exist. Mock-data dependency fully removed from dashboard.
 
 - **2026-03-19** — Dashboard Collections from DB: Replaced mock collection data with real Prisma queries from Neon PostgreSQL. Created src/lib/db/collections.ts with getRecentCollections() and getCollectionStats() functions. Dashboard page is now an async server component fetching collections directly. Collection card border color derived from most-used content type. Type icons shown per collection (normalized PascalCase DB icons to lowercase for icon map). Updated StatsCards to accept DB-driven collection counts. Updated icon map to handle StickyNote and case-insensitive lookups.

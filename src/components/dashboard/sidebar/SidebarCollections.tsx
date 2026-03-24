@@ -3,12 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronDown, Star, Folder } from "lucide-react";
+import { ChevronDown, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { Collection } from "@/lib/mock-data";
+import type { DashboardCollection } from "@/lib/db/collections";
 
 interface SidebarCollectionsProps {
-  collections: Collection[];
+  collections: DashboardCollection[];
 }
 
 export function SidebarCollections({ collections }: SidebarCollectionsProps) {
@@ -16,7 +16,7 @@ export function SidebarCollections({ collections }: SidebarCollectionsProps) {
   const pathname = usePathname();
 
   const favorites = collections.filter((c) => c.isFavorite);
-  const allCollections = collections.filter((c) => !c.isFavorite);
+  const recents = collections.filter((c) => !c.isFavorite);
 
   return (
     <div>
@@ -65,13 +65,13 @@ export function SidebarCollections({ collections }: SidebarCollectionsProps) {
             </div>
           )}
 
-          {allCollections.length > 0 && (
+          {recents.length > 0 && (
             <div>
               <span className="px-2 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-                All Collections
+                Recent
               </span>
               <nav className="mt-1 flex flex-col gap-0.5">
-                {allCollections.map((collection) => {
+                {recents.map((collection) => {
                   const href = `/collections/${collection.id}`;
                   const isActive = pathname === href;
 
@@ -87,7 +87,12 @@ export function SidebarCollections({ collections }: SidebarCollectionsProps) {
                       )}
                     >
                       <span className="flex items-center gap-2">
-                        <Folder className="h-3.5 w-3.5 text-muted-foreground" />
+                        <span
+                          className="h-3 w-3 rounded-full shrink-0"
+                          style={{
+                            backgroundColor: collection.dominantColor ?? "#6b7280",
+                          }}
+                        />
                         {collection.name}
                       </span>
                       <span className="text-xs text-muted-foreground">
@@ -99,6 +104,13 @@ export function SidebarCollections({ collections }: SidebarCollectionsProps) {
               </nav>
             </div>
           )}
+
+          <Link
+            href="/collections"
+            className="px-2 text-xs text-muted-foreground hover:text-sidebar-foreground transition-colors"
+          >
+            View all collections →
+          </Link>
         </div>
       )}
     </div>
