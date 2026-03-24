@@ -4,11 +4,11 @@ import {
   Star,
   Heart,
 } from "lucide-react";
-import type { Item } from "@/lib/mock-data";
 
 interface StatsCardsProps {
-  items: Item[];
+  totalItems: number;
   totalCollections: number;
+  favoriteItems: number;
   favoriteCollections: number;
 }
 
@@ -19,13 +19,8 @@ const stats = [
   { label: "Favorite Collections", icon: Heart, color: "#ec4899" },
 ];
 
-export function StatsCards({ items, totalCollections, favoriteCollections }: StatsCardsProps) {
-  const values = [
-    items.length,
-    totalCollections,
-    items.filter((i) => i.isFavorite).length,
-    favoriteCollections,
-  ];
+export function StatsCards({ totalItems, totalCollections, favoriteItems, favoriteCollections }: StatsCardsProps) {
+  const values = [totalItems, totalCollections, favoriteItems, favoriteCollections];
 
   return (
     <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">

@@ -1,24 +1,19 @@
 import { Pin } from "lucide-react";
-import { items } from "@/lib/mock-data";
 import { getRecentCollections, getCollectionStats } from "@/lib/db/collections";
+import { getPinnedItems, getRecentItems, getItemStats } from "@/lib/db/items";
 import { StatsCards } from "@/components/dashboard/StatsCards";
 import { CollectionCard } from "@/components/dashboard/CollectionCard";
 import { ItemRow } from "@/components/dashboard/ItemRow";
 
 export default async function DashboardPage() {
-  const [collections, collectionStats] = await Promise.all([
-    getRecentCollections(6),
-    getCollectionStats(),
-  ]);
-
-  const pinnedItems = items.filter((item) => item.isPinned);
-  const recentItems = items
-    .slice()
-    .sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    )
-    .slice(0, 10);
+  const [collections, collectionStats, pinnedItems, recentItems, itemStats] =
+    await Promise.all([
+      getRecentCollections(6),
+      getCollectionStats(),
+      getPinnedItems(),
+      getRecentItems(10),
+      getItemStats(),
+    ]);
 
   return (
     <div className="mx-auto max-w-6xl space-y-8">
@@ -28,8 +23,9 @@ export default async function DashboardPage() {
       </div>
 
       <StatsCards
-        items={items}
+        totalItems={itemStats.totalItems}
         totalCollections={collectionStats.totalCollections}
+        favoriteItems={itemStats.favoriteItems}
         favoriteCollections={collectionStats.favoriteCollections}
       />
 
