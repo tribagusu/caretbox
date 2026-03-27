@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 
 const DEMO_USER_EMAIL = "demo@devstash.io";
@@ -22,20 +23,21 @@ async function getDemoUserId(): Promise<string | null> {
   return user?.id ?? null;
 }
 
-export async function getRecentCollections(
-  limit = 6
-): Promise<DashboardCollection[]> {
+// Cached: fetches up to 10 recent collections per request.
+// Callers slice the result to their desired limit.
+export const getRecentCollections = cache(async function getRecentCollections(): Promise<DashboardCollection[]> {
   const userId = await getDemoUserId();
   if (!userId) return [];
 
   const collections = await prisma.collection.findMany({
     where: { userId },
     orderBy: { updatedAt: "desc" },
-    take: limit,
+    take: 10,
     include: {
       items: {
-        include: {
-          type: true,
+        select: {
+          typeId: true,
+          type: { select: { icon: true, color: true } },
         },
       },
     },
@@ -82,7 +84,7 @@ export async function getRecentCollections(
       updatedAt: collection.updatedAt,
     };
   });
-}
+});
 
 export async function getCollectionStats() {
   const userId = await getDemoUserId();

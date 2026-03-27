@@ -8,7 +8,7 @@ import { ItemRow } from "@/components/dashboard/ItemRow";
 export default async function DashboardPage() {
   const [collections, collectionStats, pinnedItems, recentItems, itemStats] =
     await Promise.all([
-      getRecentCollections(6),
+      getRecentCollections(),
       getCollectionStats(),
       getPinnedItems(),
       getRecentItems(10),
@@ -37,7 +37,7 @@ export default async function DashboardPage() {
           </button>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {collections.map((collection) => (
+          {collections.slice(0, 6).map((collection) => (
             <CollectionCard key={collection.id} collection={collection} />
           ))}
         </div>

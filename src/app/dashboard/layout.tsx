@@ -11,7 +11,7 @@ export default async function DashboardLayout({
 }) {
   const [sidebarItemTypes, sidebarCollections] = await Promise.all([
     getSystemItemTypes(),
-    getRecentCollections(10),
+    getRecentCollections(),
   ]);
 
   return (

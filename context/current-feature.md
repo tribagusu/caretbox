@@ -2,11 +2,23 @@
 
 ## Status
 
-Completed
+In Progress
 
 ## Goals
 
+Quick wins from codebase audit — low-risk fixes only.
+
+- [x] Fix N+1 query in `getRecentCollections` — fetches all items per collection into memory just to count types. Use Prisma `select` to only fetch `typeId`/`type` fields instead of full item records. No raw SQL — Prisma only (`src/lib/db/collections.ts:31-42`)
+- [x] Add runtime guard for `DATABASE_URL` — replace `!` non-null assertion with an explicit check and clear error message (`src/lib/prisma.ts:9`)
+- [x] Fix duplicate `getRecentCollections` call — called in both layout (limit 10) and page (limit 6). Fetch once in layout and pass down (`src/app/dashboard/layout.tsx:14`, `src/app/dashboard/page.tsx:11`)
+- [x] Fix StatsCards positional index mapping — `values[i]` silently breaks if arrays are reordered. Inline values directly into the stats array (`src/components/dashboard/StatsCards.tsx:15-23`)
+- [x] Remove dead mock-data exports — `items`, `collections`, `itemTypes` are unused. Only `currentUser` is still imported (`src/lib/mock-data.ts`)
+
 ## Notes
+
+- Not touching auth-related items (demo user pattern) — that will be a separate feature
+- Not touching seed script issues — dev-only code, low priority
+- All fixes must use Prisma ORM — no raw SQL queries
 
 ## History
 
