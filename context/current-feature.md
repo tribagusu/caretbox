@@ -2,25 +2,16 @@
 
 ## Status
 
-In Progress
+Completed
 
 ## Goals
 
-Quick wins from codebase audit — low-risk fixes only.
-
-- [x] Fix N+1 query in `getRecentCollections` — fetches all items per collection into memory just to count types. Use Prisma `select` to only fetch `typeId`/`type` fields instead of full item records. No raw SQL — Prisma only (`src/lib/db/collections.ts:31-42`)
-- [x] Add runtime guard for `DATABASE_URL` — replace `!` non-null assertion with an explicit check and clear error message (`src/lib/prisma.ts:9`)
-- [x] Fix duplicate `getRecentCollections` call — called in both layout (limit 10) and page (limit 6). Fetch once in layout and pass down (`src/app/dashboard/layout.tsx:14`, `src/app/dashboard/page.tsx:11`)
-- [x] Fix StatsCards positional index mapping — `values[i]` silently breaks if arrays are reordered. Inline values directly into the stats array (`src/components/dashboard/StatsCards.tsx:15-23`)
-- [x] Remove dead mock-data exports — `items`, `collections`, `itemTypes` are unused. Only `currentUser` is still imported (`src/lib/mock-data.ts`)
-
 ## Notes
 
-- Not touching auth-related items (demo user pattern) — that will be a separate feature
-- Not touching seed script issues — dev-only code, low priority
-- All fixes must use Prisma ORM — no raw SQL queries
-
 ## History
+
+- **2026-03-27** — Quick Wins from Codebase Audit: Fixed N+1 query in getRecentCollections by using Prisma select to fetch only typeId/type fields instead of full item records. Added runtime guard for DATABASE_URL with clear error message. Deduplicated getRecentCollections call via React.cache() so layout and page share one DB query per request. Fixed StatsCards positional index mapping by inlining values directly into the stats array. Removed dead mock-data exports (items, collections, itemTypes).
+
 
 - **2026-03-24** — Stats & Sidebar from DB: Added getSystemItemTypes() to src/lib/db/items.ts with per-user item counts. Made dashboard layout async to fetch sidebar data from DB. Removed mock-data dependency from Sidebar, DashboardShell, SidebarTypes, and SidebarCollections. Sidebar now shows system item types with icons/counts from DB. Collections sidebar shows favorites with star icons and recent (non-favorite) collections with a colored circle based on dominant item type. Added "View all collections →" link to /collections.
 
