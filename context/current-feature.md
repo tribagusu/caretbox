@@ -1,27 +1,16 @@
-# Current Feature: Auth Phase 2 - Email/Password Credentials
+# Current Feature
 
 ## Status
 
-In Progress
+Completed
 
 ## Goals
 
-- Add Credentials provider for email/password authentication
-- Create registration API route at `/api/auth/register` (name, email, password, confirmPassword)
-- Validate passwords match, check for existing user, hash with bcryptjs
-- Update `auth.config.ts` with Credentials provider placeholder (`authorize: () => null`)
-- Update `auth.ts` to override Credentials with actual bcrypt validation
-- Add password field to User model via migration if needed
-- Ensure GitHub OAuth still works after changes
-
 ## Notes
 
-- bcryptjs is already installed
-- Split auth pattern: `auth.config.ts` gets a placeholder Credentials provider, `auth.ts` overrides with real bcrypt logic
-- Registration endpoint returns success/error response
-- Test via curl, then via `/api/auth/signin` UI
-
 ## History
+
+- **2026-03-30** — Auth Phase 2 - Email/Password Credentials: Added Credentials provider using split pattern (placeholder in auth.config.ts for edge, real bcrypt validation in auth.ts). Created registration API route at /api/auth/register with input validation, duplicate check, and bcryptjs password hashing. GitHub OAuth preserved alongside credentials.
 
 - **2026-03-30** — Auth Phase 1 - NextAuth + GitHub OAuth: Installed next-auth@beta and @auth/prisma-adapter. Split auth config pattern for edge compatibility (auth.config.ts for edge, auth.ts with Prisma adapter and JWT strategy). GitHub OAuth provider with auto-detected env vars. Route protection via src/proxy.ts protecting /dashboard/* with redirect to sign-in. Extended Session type with user.id via JWT/session callbacks and TypeScript module augmentation. API route handler at app/api/auth/[...nextauth]/route.ts.
 
