@@ -1,31 +1,16 @@
-# Current Feature: Auth Setup - NextAuth + GitHub Provider
+# Current Feature
 
 ## Status
 
-In Progress
+Completed
 
 ## Goals
 
-- Install NextAuth v5 (`next-auth@beta`) and `@auth/prisma-adapter`
-- Set up split auth config pattern for edge compatibility (`auth.config.ts` + `auth.ts`)
-- Add GitHub OAuth provider
-- Protect `/dashboard/*` routes using Next.js 16 proxy (`src/proxy.ts`)
-- Redirect unauthenticated users to sign-in
-- Extend Session type with `user.id`
-- Use NextAuth's default pages for testing (no custom sign-in page)
-
 ## Notes
 
-- Use `next-auth@beta` (not `@latest` which installs v4)
-- Proxy file must be at `src/proxy.ts` (same level as `app/`)
-- Use named export: `export const proxy = auth(...)` not default export
-- Use `session: { strategy: 'jwt' }` with split config pattern
-- Don't set custom `pages.signIn` — use NextAuth's default page
-- Use Context7 to verify newest config and conventions
-- Env vars needed: `AUTH_SECRET`, `AUTH_GITHUB_ID`, `AUTH_GITHUB_SECRET`
-- Files to create: `src/auth.config.ts`, `src/auth.ts`, `src/app/api/auth/[...nextauth]/route.ts`, `src/proxy.ts`, `src/types/next-auth.d.ts`
-
 ## History
+
+- **2026-03-30** — Auth Phase 1 - NextAuth + GitHub OAuth: Installed next-auth@beta and @auth/prisma-adapter. Split auth config pattern for edge compatibility (auth.config.ts for edge, auth.ts with Prisma adapter and JWT strategy). GitHub OAuth provider with auto-detected env vars. Route protection via src/proxy.ts protecting /dashboard/* with redirect to sign-in. Extended Session type with user.id via JWT/session callbacks and TypeScript module augmentation. API route handler at app/api/auth/[...nextauth]/route.ts.
 
 - **2026-03-27** — Quick Wins from Codebase Audit: Fixed N+1 query in getRecentCollections by using Prisma select to fetch only typeId/type fields instead of full item records. Added runtime guard for DATABASE_URL with clear error message. Deduplicated getRecentCollections call via React.cache() so layout and page share one DB query per request. Fixed StatsCards positional index mapping by inlining values directly into the stats array. Removed dead mock-data exports (items, collections, itemTypes).
 
