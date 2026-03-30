@@ -17,3 +17,13 @@ Read the following to get the full context of the project:
 - **Build**: `npm run build`
 - **Production server**: `npm run start`
 - **Lint**: `npm run lint`
+
+## Neon Database
+
+When using the Neon MCP tools, **always** use these values:
+
+- **Project ID**: `nameless-river-47510753`
+- **Branch ID**: `br-rapid-field-a1mfpfmi` (development)
+- **Database**: `neondb`
+
+**NEVER** use the production branch (`br-shy-field-a1oqehef`). All queries, migrations, and operations must target the development branch only.
