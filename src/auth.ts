@@ -9,6 +9,30 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
   session: { strategy: "jwt" },
   callbacks: {
+    async signIn({ user, account }) {
+      // OAuth providers (GitHub) are always allowed — auto-verify their email
+      if (account?.provider !== "credentials") {
+        if (user.id) {
+          await prisma.user.update({
+            where: { id: user.id },
+            data: { emailVerified: new Date() },
+          });
+        }
+        return true;
+      }
+
+      // Credentials: block unverified users
+      const dbUser = await prisma.user.findUnique({
+        where: { id: user.id! },
+        select: { emailVerified: true },
+      });
+
+      if (!dbUser?.emailVerified) {
+        return `/sign-in?error=EmailNotVerified&email=${encodeURIComponent(user.email || "")}`;
+      }
+
+      return true;
+    },
     jwt({ token, user }) {
       if (user) {
         token.id = user.id;

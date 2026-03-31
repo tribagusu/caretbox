@@ -14,12 +14,15 @@ export function SignInForm() {
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
   const error = searchParams.get("error");
   const registered = searchParams.get("registered");
+  const unverifiedEmail = searchParams.get("email");
   const toastShown = useRef(false);
 
   useEffect(() => {
     if (registered && !toastShown.current) {
       toastShown.current = true;
-      toast.success("Account created! You can now sign in.");
+      toast.success(
+        "Account created! Please check your email to verify your account."
+      );
     }
   }, [registered]);
 
@@ -27,6 +30,27 @@ export function SignInForm() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [formError, setFormError] = useState("");
+  const [isResending, setIsResending] = useState(false);
+  const [showVerificationMessage, setShowVerificationMessage] = useState(
+    error === "EmailNotVerified"
+  );
+  const [verificationEmail, setVerificationEmail] = useState(
+    unverifiedEmail || ""
+  );
+
+  async function handleResendVerification() {
+    const targetEmail = verificationEmail || email;
+    if (!targetEmail) return;
+
+    setIsResending(true);
+    await fetch("/api/auth/resend-verification", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: targetEmail }),
+    });
+    setIsResending(false);
+    toast.success("Verification email sent! Please check your inbox.");
+  }
 
   async function handleCredentialsSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -44,13 +68,36 @@ export function SignInForm() {
       setFormError("Invalid email or password");
       setIsLoading(false);
     } else if (result?.url) {
+      // NextAuth redirects via URL when signIn callback returns a string
+      const url = new URL(result.url);
+      if (url.searchParams.get("error") === "EmailNotVerified") {
+        setShowVerificationMessage(true);
+        setVerificationEmail(email);
+        setFormError("");
+        setIsLoading(false);
+        return;
+      }
       window.location.href = result.url;
     }
   }
 
   return (
     <>
-      {(error || formError) && (
+      {showVerificationMessage && (
+        <div className="space-y-3 rounded-lg border border-yellow-500/50 bg-yellow-500/10 px-4 py-3 text-sm text-yellow-200">
+          <p>Your email is not verified. Please check your inbox for the verification link.</p>
+          <button
+            type="button"
+            onClick={handleResendVerification}
+            disabled={isResending}
+            className="font-medium text-yellow-400 underline underline-offset-2 hover:text-yellow-300 disabled:opacity-50"
+          >
+            {isResending ? "Sending..." : "Resend verification email"}
+          </button>
+        </div>
+      )}
+
+      {!showVerificationMessage && (error || formError) && (
         <div className="rounded-lg border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive">
           {formError || "Authentication failed. Please try again."}
         </div>

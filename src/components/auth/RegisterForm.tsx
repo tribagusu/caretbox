@@ -1,19 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Mail } from "lucide-react";
 import Link from "next/link";
 
 export function RegisterForm() {
-  const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [emailSent, setEmailSent] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -40,7 +41,29 @@ export function RegisterForm() {
       return;
     }
 
-    router.push("/sign-in?registered=true");
+    setEmailSent(true);
+  }
+
+  if (emailSent) {
+    return (
+      <div className="space-y-4 text-center">
+        <Mail className="mx-auto h-10 w-10 text-primary" />
+        <h2 className="text-lg font-semibold text-foreground">
+          Check your email
+        </h2>
+        <p className="text-sm text-muted-foreground">
+          We sent a verification link to{" "}
+          <span className="font-medium text-foreground">{email}</span>. Click
+          the link to activate your account.
+        </p>
+        <Link
+          href="/sign-in?registered=true"
+          className={buttonVariants({ variant: "outline", className: "w-full" })}
+        >
+          Go to sign in
+        </Link>
+      </div>
+    );
   }
 
   return (
