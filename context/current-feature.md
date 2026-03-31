@@ -1,29 +1,16 @@
-# Current Feature — Email Verification on Register
+# Current Feature
 
 ## Status
 
-In Progress
+Completed
 
 ## Goals
 
-- After registration, user receives a verification email via Resend with a unique token link
-- User must click the link to verify their email before they can sign in
-- Unverified users are blocked from signing in (credentials + OAuth already verified via provider)
-- Verification tokens expire after 24 hours
-- Resend expired token option on sign-in page when verification is pending
-- Set `emailVerified` field on User model upon successful verification
-
 ## Notes
 
-- Using **Resend** for transactional emails (RESEND_API_KEY already in .env)
-- Prisma schema already has `emailVerified: DateTime?` on User and a `VerificationToken` model (from NextAuth)
-- Create a new `verification_tokens` table (separate from NextAuth's) or reuse the existing one for email verification
-- Verification flow: register → create token → send email → user clicks link → verify route updates `emailVerified` → redirect to sign-in with success message
-- Block sign-in for credentials users where `emailVerified` is null (GitHub OAuth users are auto-verified)
-- Token format: secure random string, stored hashed in DB
-- Verification page route: `/verify-email?token=...`
-
 ## History
+
+- **2026-03-31** — Email Verification on Register: Verification email sent via Resend after registration. Users must click the link to verify before signing in. Unverified credentials users blocked in signIn callback; GitHub OAuth users auto-verified. Reuses existing VerificationToken Prisma model with 24h expiry. New files: src/lib/email.ts (Resend client), src/lib/tokens.ts (token generation/verification), /verify-email page with loading/success/error states, /api/auth/verify-email and /api/auth/resend-verification routes. RegisterForm shows "check your email" screen after registration. SignInForm shows verification warning with resend button when blocked. Added scripts/clean-users.ts utility.
 
 - **2026-03-31** — Auth Phase 3 - Auth UI: Custom sign-in page (/sign-in) with email/password and GitHub OAuth button. Custom register page (/register) with name, email, password, confirm password fields and validation. Sonner toast notification on successful registration. Reusable UserAvatar component (GitHub image or initials fallback). Sidebar user section updated with real NextAuth session data, avatar linking to /profile, and sign-out dropdown. Removed mock-data user dependency from Sidebar/DashboardShell. Pages are server components with client form components extracted.
 
