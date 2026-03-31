@@ -1,26 +1,17 @@
-# Current Feature: Auth UI - Sign In, Register & Sign Out
+# Current Feature
 
 ## Status
 
-In Progress
+Completed
 
 ## Goals
 
-- Custom sign-in page at `/sign-in` with email/password fields, GitHub OAuth button, and link to register
-- Custom register page at `/register` with name, email, password, confirm password fields and validation
-- User avatar in bottom of sidebar (GitHub image or initials fallback)
-- Dropdown on avatar click with "Sign out" option
-- Clicking avatar icon navigates to `/profile`
-- Reusable avatar component handling both image and initials cases
-
 ## Notes
 
-- Replace NextAuth default pages with custom UI
-- Registration form submits to existing `/api/auth/register` endpoint
-- Redirect to sign-in on successful registration
-- Initials derived from user name (e.g., "Brad Traversy" → "BT")
-
 ## History
+
+- **2026-03-31** — Auth Phase 3 - Auth UI: Custom sign-in page (/sign-in) with email/password and GitHub OAuth button. Custom register page (/register) with name, email, password, confirm password fields and validation. Sonner toast notification on successful registration. Reusable UserAvatar component (GitHub image or initials fallback). Sidebar user section updated with real NextAuth session data, avatar linking to /profile, and sign-out dropdown. Removed mock-data user dependency from Sidebar/DashboardShell. Pages are server components with client form components extracted.
+
 
 - **2026-03-30** — Auth Phase 2 - Email/Password Credentials: Added Credentials provider using split pattern (placeholder in auth.config.ts for edge, real bcrypt validation in auth.ts). Created registration API route at /api/auth/register with input validation, duplicate check, and bcryptjs password hashing. GitHub OAuth preserved alongside credentials.
 
