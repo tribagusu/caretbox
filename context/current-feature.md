@@ -1,23 +1,16 @@
-# Current Feature: Email Verification Toggle
+# Current Feature
 
 ## Status
 
-In Progress
+Completed
 
 ## Goals
 
-- Add `ENABLE_EMAIL_VERIFICATION` env variable to control the email verification system
-- When `false`: auto-verify users on registration, skip sending email, skip sign-in verification check
-- When `true` (or unset): current behavior preserved — verification email sent, unverified users blocked
-- Minimal changes — conditional branches in existing code, no file additions or removals
-
 ## Notes
 
-- Problem: No domain linked to Resend yet, so only the Resend test email can receive emails. This blocks registration for real users.
-- Touch points: register route (skip email, auto-verify), auth.ts signIn callback (skip check), resend-verification route (early return)
-- Default to `true` so existing behavior is preserved unless explicitly disabled
-
 ## History
+
+- **2026-04-02** — Email Verification Toggle: Added ENABLE_EMAIL_VERIFICATION env variable to disable/enable the email verification system. When set to "false": registration auto-verifies users and skips sending email, signIn callback skips the unverified check, resend-verification route no-ops, and RegisterForm redirects to sign-in instead of showing "check email" screen. When "true" or unset, existing behavior is preserved. Needed because no domain is linked to Resend yet, blocking real user registration.
 
 - **2026-03-31** — Email Verification on Register: Verification email sent via Resend after registration. Users must click the link to verify before signing in. Unverified credentials users blocked in signIn callback; GitHub OAuth users auto-verified. Reuses existing VerificationToken Prisma model with 24h expiry. New files: src/lib/email.ts (Resend client), src/lib/tokens.ts (token generation/verification), /verify-email page with loading/success/error states, /api/auth/verify-email and /api/auth/resend-verification routes. RegisterForm shows "check your email" screen after registration. SignInForm shows verification warning with resend button when blocked. Added scripts/clean-users.ts utility.
 
