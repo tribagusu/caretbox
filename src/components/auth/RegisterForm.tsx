@@ -41,6 +41,11 @@ export function RegisterForm() {
       return;
     }
 
+    if (!data.requiresVerification) {
+      window.location.href = "/sign-in?registered=true";
+      return;
+    }
+
     setEmailSent(true);
   }
 

@@ -21,14 +21,16 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         return true;
       }
 
-      // Credentials: block unverified users
-      const dbUser = await prisma.user.findUnique({
-        where: { id: user.id! },
-        select: { emailVerified: true },
-      });
+      // Credentials: block unverified users (when email verification is enabled)
+      if (process.env.ENABLE_EMAIL_VERIFICATION !== "false") {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: user.id! },
+          select: { emailVerified: true },
+        });
 
-      if (!dbUser?.emailVerified) {
-        return `/sign-in?error=EmailNotVerified&email=${encodeURIComponent(user.email || "")}`;
+        if (!dbUser?.emailVerified) {
+          return `/sign-in?error=EmailNotVerified&email=${encodeURIComponent(user.email || "")}`;
+        }
       }
 
       return true;

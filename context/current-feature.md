@@ -1,12 +1,21 @@
-# Current Feature
+# Current Feature: Email Verification Toggle
 
 ## Status
 
-Completed
+In Progress
 
 ## Goals
 
+- Add `ENABLE_EMAIL_VERIFICATION` env variable to control the email verification system
+- When `false`: auto-verify users on registration, skip sending email, skip sign-in verification check
+- When `true` (or unset): current behavior preserved — verification email sent, unverified users blocked
+- Minimal changes — conditional branches in existing code, no file additions or removals
+
 ## Notes
+
+- Problem: No domain linked to Resend yet, so only the Resend test email can receive emails. This blocks registration for real users.
+- Touch points: register route (skip email, auto-verify), auth.ts signIn callback (skip check), resend-verification route (early return)
+- Default to `true` so existing behavior is preserved unless explicitly disabled
 
 ## History
 
