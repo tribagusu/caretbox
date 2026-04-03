@@ -4,7 +4,7 @@ import { generateVerificationToken } from "@/lib/tokens";
 import { sendVerificationEmail } from "@/lib/email";
 
 export async function POST(request: Request) {
-  if (process.env.ENABLE_EMAIL_VERIFICATION === "false") {
+  if (process.env.SKIP_EMAIL_VERIFICATION === "true") {
     return NextResponse.json({ success: true });
   }
 

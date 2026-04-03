@@ -21,8 +21,8 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         return true;
       }
 
-      // Credentials: block unverified users (when email verification is enabled)
-      if (process.env.ENABLE_EMAIL_VERIFICATION !== "false") {
+      // Credentials: block unverified users (unless verification is skipped)
+      if (process.env.SKIP_EMAIL_VERIFICATION !== "true") {
         const dbUser = await prisma.user.findUnique({
           where: { id: user.id! },
           select: { emailVerified: true },
