@@ -1,30 +1,16 @@
-# Current Feature: Forgot Password
+# Current Feature
 
 ## Status
 
-In Progress
+Completed
 
 ## Goals
 
-- Add "Forgot password?" link on the sign-in page
-- `/forgot-password` page with email input — sends a password reset email via Resend
-- `/reset-password?token=...` page with new password + confirm password form
-- `POST /api/auth/forgot-password` route — generates token, sends reset email, never reveals whether email exists
-- `POST /api/auth/reset-password` route — validates token, hashes new password, updates user, deletes token
-- Reuse the existing `VerificationToken` Prisma model (no schema changes) with separate token helpers
-- Reuse `SKIP_EMAIL_VERIFICATION` behavior — when true, skip sending the email (log token to console instead)
-- Token expires in 1 hour (shorter than the 24h verification token)
-- Only credentials users (users with a password) can reset — GitHub-only users shown appropriate message
-
 ## Notes
 
-- Existing infrastructure to reuse: `src/lib/tokens.ts` (generateVerificationToken, verifyToken, deleteVerificationToken), `src/lib/email.ts` (Resend client), VerificationToken model
-- Add `sendPasswordResetEmail()` to `src/lib/email.ts`
-- Add `generatePasswordResetToken()` and `verifyPasswordResetToken()` to `src/lib/tokens.ts` (1h expiry, separate from 24h verification tokens)
-- Pages are server components; forms extracted as client components (`ForgotPasswordForm`, `ResetPasswordForm`)
-- Follow existing patterns from verify-email flow for the reset-password page (Suspense + client component reading query params)
-
 ## History
+
+- **2026-04-03** — Forgot Password: Added "Forgot password?" link on sign-in page, /forgot-password page with email input, /reset-password?token= page with new password + confirm form. API routes: POST /api/auth/forgot-password (generates token, sends reset email via Resend, never reveals email existence) and POST /api/auth/reset-password (validates token, hashes new password with bcrypt, updates user, deletes token). Reuses VerificationToken model with pwd-reset: prefix and 1h expiry. Only credentials users can reset; GitHub-only users silently skipped. Respects SKIP_EMAIL_VERIFICATION (logs token to console when true).
 
 - **2026-04-03** — Email Verification Toggle: Added SKIP_EMAIL_VERIFICATION env variable (default false). When set to "true": registration auto-verifies users and skips sending email, signIn callback skips the unverified check, resend-verification route no-ops, and RegisterForm redirects to sign-in instead of showing "check email" screen. In production, no env needed — verification works by default. Needed because no domain is linked to Resend yet, blocking real user registration.
 
