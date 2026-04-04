@@ -13,10 +13,14 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       // OAuth providers (GitHub) are always allowed — auto-verify their email
       if (account?.provider !== "credentials") {
         if (user.id) {
-          await prisma.user.update({
-            where: { id: user.id },
-            data: { emailVerified: new Date() },
-          });
+          try {
+            await prisma.user.update({
+              where: { id: user.id },
+              data: { emailVerified: new Date() },
+            });
+          } catch {
+            // User may not exist yet on first OAuth sign-in (adapter creates them after)
+          }
         }
         return true;
       }
