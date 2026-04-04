@@ -9,10 +9,10 @@ interface CollectionCardProps {
 export function CollectionCard({ collection }: CollectionCardProps) {
   return (
     <div
-      className="group rounded-xl border border-border bg-card p-4 transition-colors hover:border-muted-foreground/30"
+      className="group rounded-xl border border-border border-l-2 bg-card p-4 transition-colors hover:border-muted-foreground/30"
       style={
         collection.dominantColor
-          ? { borderColor: `${collection.dominantColor}33` }
+          ? { borderLeftColor: collection.dominantColor }
           : undefined
       }
     >

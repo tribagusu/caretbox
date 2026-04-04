@@ -11,7 +11,10 @@ export function ItemRow({ item }: ItemRowProps) {
   const color = item.type.color ?? "#6366f1";
 
   return (
-    <div className="flex items-center gap-3 rounded-lg border border-border bg-card px-4 py-3 transition-colors hover:border-muted-foreground/30">
+    <div
+      className="flex items-center gap-3 rounded-lg border border-border border-l-2 bg-card px-4 py-3 transition-colors hover:border-muted-foreground/30"
+      style={{ borderLeftColor: color }}
+    >
       <div
         className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
         style={{ backgroundColor: `${color}20` }}
