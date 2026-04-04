@@ -4,7 +4,8 @@ import NextAuth from "next-auth";
 const { auth } = NextAuth(authConfig);
 
 export const proxy = auth((req) => {
-  if (!req.auth && req.nextUrl.pathname.startsWith("/dashboard")) {
+  const path = req.nextUrl.pathname;
+  if (!req.auth && (path.startsWith("/dashboard") || path.startsWith("/profile"))) {
     const signInUrl = new URL("/sign-in", req.nextUrl.origin);
     signInUrl.searchParams.set("callbackUrl", req.nextUrl.pathname);
     return Response.redirect(signInUrl);

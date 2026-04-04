@@ -1,12 +1,26 @@
-# Current Feature
+# Current Feature: Profile Page
 
 ## Status
 
-Completed
+In Progress
 
 ## Goals
 
+- Create `/profile` page (protected route, requires auth)
+- Display user info: email, name, avatar (GitHub image or initials), account creation date
+- Show usage stats: total items, total collections, breakdown by item type (snippets, prompts, notes, commands, links, files, images)
+- Change password section — only visible for credentials users (not GitHub OAuth)
+- Delete account with confirmation dialog to prevent accidental deletion
+- Follow existing codebase patterns for data fetching and components
+
 ## Notes
+
+- Avatar: reuse existing `UserAvatar` component (handles GitHub image vs initials fallback)
+- Detect credentials vs OAuth user by checking if `user.password` exists (server-side) or if `user.image` is set (client hint)
+- Data fetching: server component page fetching stats via Prisma, pass to client components where needed
+- Delete account: needs API route `DELETE /api/auth/account` with cascade deletion
+- Change password: needs API route `POST /api/auth/change-password` with current + new password validation
+- Use ShadCN AlertDialog for delete confirmation
 
 ## History
 
