@@ -1,28 +1,16 @@
-# Current Feature: Profile Page
+# Current Feature
 
 ## Status
 
-In Progress
+Completed
 
 ## Goals
 
-- Create `/profile` page (protected route, requires auth)
-- Display user info: email, name, avatar (GitHub image or initials), account creation date
-- Show usage stats: total items, total collections, breakdown by item type (snippets, prompts, notes, commands, links, files, images)
-- Change password section — only visible for credentials users (not GitHub OAuth)
-- Delete account with confirmation dialog to prevent accidental deletion
-- Follow existing codebase patterns for data fetching and components
-
 ## Notes
 
-- Avatar: reuse existing `UserAvatar` component (handles GitHub image vs initials fallback)
-- Detect credentials vs OAuth user by checking if `user.password` exists (server-side) or if `user.image` is set (client hint)
-- Data fetching: server component page fetching stats via Prisma, pass to client components where needed
-- Delete account: needs API route `DELETE /api/auth/account` with cascade deletion
-- Change password: needs API route `POST /api/auth/change-password` with current + new password validation
-- Use ShadCN AlertDialog for delete confirmation
-
 ## History
+
+- **2026-04-04** — Profile Page: Created /profile page (protected via proxy.ts) with user info (name, email, avatar via UserAvatar, join date), usage stats (total items, total collections, per-type breakdown with icons), change password form (credentials users only, validates current password), and delete account with ShadCN AlertDialog confirmation and Loader2 spinner. Uses Prisma cascade delete for account removal. New files: src/lib/db/profile.ts (getProfileData, getProfileStats), src/app/profile/page.tsx, src/components/profile/ProfileContent.tsx, API routes POST /api/auth/change-password and DELETE /api/auth/account. Installed ShadCN alert-dialog component.
 
 - **2026-04-03** — Forgot Password: Added "Forgot password?" link on sign-in page, /forgot-password page with email input, /reset-password?token= page with new password + confirm form. API routes: POST /api/auth/forgot-password (generates token, sends reset email via Resend, never reveals email existence) and POST /api/auth/reset-password (validates token, hashes new password with bcrypt, updates user, deletes token). Reuses VerificationToken model with pwd-reset: prefix and 1h expiry. Only credentials users can reset; GitHub-only users silently skipped. Respects SKIP_EMAIL_VERIFICATION (logs token to console when true).
 
