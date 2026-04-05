@@ -89,6 +89,14 @@ Example v4 configuration:
 - Return `{ success, data, error }` pattern from actions
 - Display user-friendly error messages via toast
 
+## Testing
+
+- Vitest for unit tests (`npm run test`)
+- Test server actions and utility functions only (not components)
+- Test files live next to source: `src/lib/db/items.test.ts`, `src/actions/items.test.ts`
+- Mock external dependencies (Prisma, auth, email) — test logic, not integrations
+- Use `describe` / `it` blocks with clear test names
+
 ## Code Quality
 
 - No commented-out code unless specified
