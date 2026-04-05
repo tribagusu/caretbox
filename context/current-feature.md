@@ -2,27 +2,15 @@
 
 ## Status
 
-In Progress
+Completed
 
 ## Goals
 
-- Delete button in item drawer action bar opens a confirmation dialog
-- On confirm, deletes the item via server action with auth/ownership check
-- Drawer closes after successful delete
-- Toast notification on success or error
-- Underlying list refreshes to reflect the deletion (router.refresh)
-
 ## Notes
 
-- Use ShadCN AlertDialog for confirmation (already installed from profile page)
-- Server action: `deleteItem(itemId)` in `src/actions/items.ts`
-- Query function: `deleteItem(userId, id)` in `src/lib/db/items.ts`
-- Prisma cascade deletes handle ItemTag cleanup automatically
-- Follow existing `{ success, error }` return pattern
-- Wire Delete button onClick in ItemDrawer to trigger the dialog
-- ItemDrawerProvider needs an `onItemDeleted` callback to close drawer after delete
-
 ## History
+
+- **2026-04-05** — Item Delete: Delete button in item drawer action bar opens ShadCN AlertDialog confirmation dialog. On confirm, deletes item via deleteItem() server action in src/actions/items.ts with auth/ownership check. Query function deleteItem() in src/lib/db/items.ts uses Prisma cascade for ItemTag cleanup. Drawer closes after successful delete, toast notification on success/error, router.refresh() updates underlying list. ItemDrawerProvider passes onItemDeleted callback to clear drawer state. Added 3 tests for deleteItem action (unauthorized, not found, success).
 
 - **2026-04-05** — Item Drawer Edit Mode: Clicking Edit in the item drawer toggles inline edit mode with Save/Cancel buttons replacing the action bar. Editable fields: title (text input), description (textarea), tags (comma-separated input), plus type-specific fields — content (textarea for snippet/prompt/command/note), language (text for snippet/command), URL (text for link). Server action updateItem() in src/actions/items.ts validates with Zod v4, returns field errors to client. Query function updateItem() in src/lib/db/items.ts handles tag disconnect-all/connect-or-create. Toast on success/error, drawer refreshes data after save, router.refresh() updates underlying list. Also refactored all query functions in items.ts and collections.ts to accept userId parameter instead of hardcoded getDemoUserId(), making data scoped to the actual logged-in user. New files: src/actions/items.ts, src/actions/items.test.ts (8 tests), context/features/item-drawer-edit-spec.md.
 
