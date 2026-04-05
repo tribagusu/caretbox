@@ -215,6 +215,18 @@ export async function updateItem(
   };
 }
 
+export async function deleteItem(userId: string, id: string): Promise<boolean> {
+  const item = await prisma.item.findUnique({
+    where: { id, userId },
+    select: { id: true },
+  });
+
+  if (!item) return false;
+
+  await prisma.item.delete({ where: { id } });
+  return true;
+}
+
 export async function getSystemItemTypes(userId: string): Promise<SidebarItemType[]> {
   const itemTypes = await prisma.itemType.findMany({
     where: { isSystem: true },

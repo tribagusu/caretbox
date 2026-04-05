@@ -42,6 +42,11 @@ export function ItemDrawerProvider({ children }: { children: React.ReactNode }) 
     setItem(updated);
   }, []);
 
+  const handleItemDeleted = useCallback(() => {
+    setOpen(false);
+    setItem(null);
+  }, []);
+
   return (
     <ItemDrawerContext.Provider value={{ openItem }}>
       {children}
@@ -51,6 +56,7 @@ export function ItemDrawerProvider({ children }: { children: React.ReactNode }) 
         item={item}
         loading={loading}
         onItemUpdated={handleItemUpdated}
+        onItemDeleted={handleItemDeleted}
       />
     </ItemDrawerContext.Provider>
   );

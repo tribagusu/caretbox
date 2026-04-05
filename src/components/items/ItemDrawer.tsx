@@ -23,7 +23,18 @@ import {
 import { getIcon } from "@/lib/icons";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { updateItem } from "@/actions/items";
+import { updateItem, deleteItem } from "@/actions/items";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import type { ItemDetail } from "@/lib/db/items";
 
 interface ItemDrawerProps {
@@ -32,6 +43,7 @@ interface ItemDrawerProps {
   item: ItemDetail | null;
   loading: boolean;
   onItemUpdated?: (item: ItemDetail) => void;
+  onItemDeleted?: () => void;
 }
 
 function DrawerSkeleton() {
@@ -118,10 +130,12 @@ export function ItemDrawer({
   item,
   loading,
   onItemUpdated,
+  onItemDeleted,
 }: ItemDrawerProps) {
   const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [form, setForm] = useState<EditFormState>({
     title: "",
     description: "",
@@ -183,6 +197,25 @@ export function ItemDrawer({
     toast.success("Item updated");
     setEditing(false);
     onItemUpdated?.(result.data);
+    router.refresh();
+  };
+
+  const handleDelete = async () => {
+    if (!item) return;
+    setDeleting(true);
+
+    const result = await deleteItem(item.id);
+
+    setDeleting(false);
+
+    if (!result.success) {
+      toast.error(result.error);
+      return;
+    }
+
+    toast.success("Item deleted");
+    onOpenChange(false);
+    onItemDeleted?.();
     router.refresh();
   };
 
@@ -295,13 +328,38 @@ export function ItemDrawer({
                     label="Edit"
                     onClick={handleEdit}
                   />
-                  <button
-                    title="Delete"
-                    className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-sm text-red-400 transition-colors hover:bg-red-500/10"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    <span className="hidden sm:inline">Delete</span>
-                  </button>
+                  <AlertDialog>
+                    <AlertDialogTrigger
+                      render={
+                        <button className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-sm text-red-400 transition-colors hover:bg-red-500/10">
+                          <Trash2 className="h-4 w-4" />
+                          <span className="hidden sm:inline">Delete</span>
+                        </button>
+                      }
+                    />
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete item?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This will permanently delete &quot;{item.title}&quot;.
+                          This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={handleDelete}
+                          disabled={deleting}
+                          className="bg-red-600 hover:bg-red-700"
+                        >
+                          {deleting ? (
+                            <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+                          ) : null}
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               </div>
             )}

@@ -2,11 +2,25 @@
 
 ## Status
 
-Completed
+In Progress
 
 ## Goals
 
+- Delete button in item drawer action bar opens a confirmation dialog
+- On confirm, deletes the item via server action with auth/ownership check
+- Drawer closes after successful delete
+- Toast notification on success or error
+- Underlying list refreshes to reflect the deletion (router.refresh)
+
 ## Notes
+
+- Use ShadCN AlertDialog for confirmation (already installed from profile page)
+- Server action: `deleteItem(itemId)` in `src/actions/items.ts`
+- Query function: `deleteItem(userId, id)` in `src/lib/db/items.ts`
+- Prisma cascade deletes handle ItemTag cleanup automatically
+- Follow existing `{ success, error }` return pattern
+- Wire Delete button onClick in ItemDrawer to trigger the dialog
+- ItemDrawerProvider needs an `onItemDeleted` callback to close drawer after delete
 
 ## History
 
