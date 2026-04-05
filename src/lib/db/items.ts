@@ -96,6 +96,24 @@ export interface SidebarItemType {
   count: number;
 }
 
+export async function getItemsByType(
+  typeName: string
+): Promise<DashboardItem[]> {
+  const userId = await getDemoUserId();
+  if (!userId) return [];
+
+  const items = await prisma.item.findMany({
+    where: {
+      userId,
+      type: { name: { equals: typeName, mode: "insensitive" } },
+    },
+    orderBy: { createdAt: "desc" },
+    include: itemInclude,
+  });
+
+  return items.map(mapItem);
+}
+
 export async function getSystemItemTypes(): Promise<SidebarItemType[]> {
   const userId = await getDemoUserId();
   if (!userId) return [];
