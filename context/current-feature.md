@@ -1,29 +1,17 @@
-# Current Feature: Item Drawer
+# Current Feature
 
 ## Status
 
-In Progress
+Completed
 
 ## Goals
 
-- Right-side slide-in drawer (shadcn Sheet) opens when clicking an ItemCard
-- Works on both dashboard and items list pages
-- Action bar: Favorite (star, yellow when active), Pin, Copy, Edit (pencil), Delete (trash, right-aligned)
-- Display item details: description, content, tags, collections, language, dates
-- Client wrapper component manages drawer state (pages are server components)
-- Full item detail fetched on click via API route (`/api/items/[id]`)
-- Query function in `lib/db/items.ts`, API route with auth check
-- Skeleton/loading state while fetching
-- No code editor or item-specific extras yet — just the detail display
-
 ## Notes
 
-- Spec file: `context/features/item-drawer-spec.md`
-- Screenshot reference: `context/screenshots/dashboard-ui-drawer.png`
-- Screenshot shows: drawer with title, type badges (Snippets + typescript), action bar (Favorite/Pin/Copy/Edit/Delete), description text, content block with syntax-highlighted code, tags list, collections list, and details section (Created/Updated dates)
-- Delete button is right-aligned, separated from other actions
-
 ## History
+
+- **2026-04-05** — Item Drawer: Right-side slide-in drawer (shadcn Sheet) opens when clicking any ItemCard or ItemRow on dashboard and items list pages. Full item detail fetched on click via GET /api/items/[id] with auth check. New getItemById() query in src/lib/db/items.ts returns ItemDetail (content, language, url, collection, timestamps). Drawer displays type badge, language badge, action bar (Favorite/Pin/Copy/Edit/Delete with delete right-aligned), description, content block, URL, tags, collection, and created/updated dates. Skeleton loading state while fetching. ItemDrawerProvider context manages drawer state, wraps both dashboard and items layouts. ItemCard and ItemRow converted to client components with click handlers. New files: src/components/items/ItemDrawer.tsx, src/components/items/ItemDrawerProvider.tsx, src/app/api/items/[id]/route.ts, context/features/item-drawer-spec.md.
+
 
 - **2026-04-05** — Vitest Setup: Installed vitest for unit testing server actions and utilities (not components). Config at vitest.config.ts with node environment, @/ path alias, includes src/**/*.test.ts, excludes src/components/** and src/app/**. Added npm scripts: test (single run), test:watch. Updated CLAUDE.md with test commands, ai-interaction.md workflow step 4, and coding-standards.md with Testing section.
 
