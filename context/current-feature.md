@@ -2,29 +2,15 @@
 
 ## Status
 
-In Progress
+Completed
 
 ## Goals
 
-- Edit button in item drawer toggles inline edit mode (no navigation)
-- Editable fields: title, description, tags, plus type-specific (content, language, url)
-- Save persists via server action with Zod validation, Cancel discards changes
-- Action bar replaced with Save/Cancel buttons in edit mode
-- Toast notification on save success/error
-- Drawer refreshes data after save, underlying list reflects changes via router.refresh()
-
 ## Notes
 
-- No form library — controlled inputs with local state
-- Client-side: disable Save when title empty
-- Server-side: Zod validates all fields (source of truth), returns errors to client
-- Tag handling: comma-separated input → array on save; disconnect all existing, connect-or-create new
-- Non-editable in edit mode: item type, collections, dates
-- Server action: `updateItem(itemId, data)` in `src/actions/items.ts`
-- Query function: `updateItem` in `src/lib/db/items.ts`
-- Spec: context/features/item-drawer-edit-spec.md
-
 ## History
+
+- **2026-04-05** — Item Drawer Edit Mode: Clicking Edit in the item drawer toggles inline edit mode with Save/Cancel buttons replacing the action bar. Editable fields: title (text input), description (textarea), tags (comma-separated input), plus type-specific fields — content (textarea for snippet/prompt/command/note), language (text for snippet/command), URL (text for link). Server action updateItem() in src/actions/items.ts validates with Zod v4, returns field errors to client. Query function updateItem() in src/lib/db/items.ts handles tag disconnect-all/connect-or-create. Toast on success/error, drawer refreshes data after save, router.refresh() updates underlying list. Also refactored all query functions in items.ts and collections.ts to accept userId parameter instead of hardcoded getDemoUserId(), making data scoped to the actual logged-in user. New files: src/actions/items.ts, src/actions/items.test.ts (8 tests), context/features/item-drawer-edit-spec.md.
 
 - **2026-04-05** — Item Drawer: Right-side slide-in drawer (shadcn Sheet) opens when clicking any ItemCard or ItemRow on dashboard and items list pages. Full item detail fetched on click via GET /api/items/[id] with auth check. New getItemById() query in src/lib/db/items.ts returns ItemDetail (content, language, url, collection, timestamps). Drawer displays type badge, language badge, action bar (Favorite/Pin/Copy/Edit/Delete with delete right-aligned), description, content block, URL, tags, collection, and created/updated dates. Skeleton loading state while fetching. ItemDrawerProvider context manages drawer state, wraps both dashboard and items layouts. ItemCard and ItemRow converted to client components with click handlers. New files: src/components/items/ItemDrawer.tsx, src/components/items/ItemDrawerProvider.tsx, src/app/api/items/[id]/route.ts, context/features/item-drawer-spec.md.
 
