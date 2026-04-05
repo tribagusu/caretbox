@@ -1,23 +1,16 @@
-# Current Feature: Items List View
+# Current Feature
 
 ## Status
 
-In Progress
+Completed
 
 ## Goals
 
-- Create dynamic route `/items/[type]` (e.g., /items/snippets, /items/notes)
-- Fetch and display items filtered by type
-- Responsive grid of ItemCard components
-- Two columns on medium and up
-- Each card has left border colored by item type
-- Follow existing codebase patterns
-
 ## Notes
 
-- Spec: context/features/item-list-view-spec.md
-
 ## History
+
+- **2026-04-05** — Items List View: Created dynamic route /items/[type] displaying type-filtered items in a responsive 2-column grid. New files: src/app/items/[type]/page.tsx (server component with type validation via getSystemItemTypes, notFound() for invalid types, empty state), src/app/items/layout.tsx (shared DashboardShell layout with sidebar), src/components/items/ItemCard.tsx (grid card with colored left border, icon badge, tags, pin/favorite indicators). Added getItemsByType() to src/lib/db/items.ts with case-insensitive type matching. Protected /items routes via proxy.ts.
 
 - **2026-04-04** — Profile Page: Created /profile page (protected via proxy.ts) with user info (name, email, avatar via UserAvatar, join date), usage stats (total items, total collections, per-type breakdown with icons), change password form (credentials users only, validates current password), and delete account with ShadCN AlertDialog confirmation and Loader2 spinner. Uses Prisma cascade delete for account removal. New files: src/lib/db/profile.ts (getProfileData, getProfileStats), src/app/profile/page.tsx, src/components/profile/ProfileContent.tsx, API routes POST /api/auth/change-password and DELETE /api/auth/account. Installed ShadCN alert-dialog component.
 
