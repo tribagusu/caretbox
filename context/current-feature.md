@@ -2,11 +2,28 @@
 
 ## Status
 
-Completed
+In Progress
 
 ## Goals
 
+- Modal dialog for creating new items, triggered from "New Item" button in top bar
+- Type selector with dynamic fields based on selected type
+- Server action with Zod validation
+- Query function in lib/db/items.ts
+- Toast feedback, modal close, and list refresh on success
+
 ## Notes
+
+- Use shadcn Dialog component
+- Type selector: snippet, prompt, command, note, link
+- Fields by type:
+  - All types: title (required), description, tags
+  - snippet/command: content, language
+  - prompt/note: content
+  - link: URL (required)
+- Server action `createItem` with Zod validation
+- Query function `createItem` in `lib/db/items.ts`
+- Toast on success, close modal and refresh
 
 ## History
 

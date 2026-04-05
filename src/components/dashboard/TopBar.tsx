@@ -1,12 +1,20 @@
 "use client";
 
+import { useState } from "react";
 import { Search, Plus, PanelLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/dashboard/SidebarContext";
+import { CreateItemDialog } from "@/components/items/CreateItemDialog";
+import type { SidebarItemType } from "@/lib/db/items";
 
-export function TopBar() {
+interface TopBarProps {
+  itemTypes?: SidebarItemType[];
+}
+
+export function TopBar({ itemTypes = [] }: TopBarProps) {
   const { toggleSidebar, openMobile } = useSidebar();
+  const [createOpen, setCreateOpen] = useState(false);
 
   return (
     <header className="flex h-14 items-center justify-between border-b border-border px-4">
@@ -46,11 +54,22 @@ export function TopBar() {
       </div>
 
       <div className="flex items-center gap-2">
-        <Button variant="outline" size="sm" className="h-8 text-xs">
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-8 text-xs"
+          onClick={() => setCreateOpen(true)}
+        >
           <Plus className="mr-1 h-3.5 w-3.5" />
           New Item
         </Button>
       </div>
+
+      <CreateItemDialog
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        itemTypes={itemTypes}
+      />
     </header>
   );
 }

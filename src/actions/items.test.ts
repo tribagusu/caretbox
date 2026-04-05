@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { updateItem, deleteItem } from "./items";
+import { createItem, updateItem, deleteItem } from "./items";
 
 const mockAuth = vi.fn();
+const mockCreateItemQuery = vi.fn();
 const mockUpdateItemQuery = vi.fn();
 const mockDeleteItemQuery = vi.fn();
 
@@ -10,6 +11,7 @@ vi.mock("@/auth", () => ({
 }));
 
 vi.mock("@/lib/db/items", () => ({
+  createItem: (...args: unknown[]) => mockCreateItemQuery(...args),
   updateItem: (...args: unknown[]) => mockUpdateItemQuery(...args),
   deleteItem: (...args: unknown[]) => mockDeleteItemQuery(...args),
 }));
@@ -30,6 +32,118 @@ const fakeItem = {
   tags: [{ id: "tag-1", name: "react" }],
   collection: null,
 };
+
+describe("createItem", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("returns unauthorized when no session", async () => {
+    mockAuth.mockResolvedValue(null);
+
+    const result = await createItem({
+      title: "Test",
+      typeId: "type-1",
+      tags: [],
+    });
+
+    expect(result).toEqual({ success: false, error: "Unauthorized" });
+    expect(mockCreateItemQuery).not.toHaveBeenCalled();
+  });
+
+  it("returns validation errors for empty title", async () => {
+    mockAuth.mockResolvedValue({ user: { id: "user-1" } });
+
+    const result = await createItem({
+      title: "   ",
+      typeId: "type-1",
+      tags: [],
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success && typeof result.error !== "string") {
+      expect(result.error.title).toBeDefined();
+    }
+    expect(mockCreateItemQuery).not.toHaveBeenCalled();
+  });
+
+  it("returns validation errors for missing typeId", async () => {
+    mockAuth.mockResolvedValue({ user: { id: "user-1" } });
+
+    const result = await createItem({
+      title: "Test",
+      typeId: "",
+      tags: [],
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success && typeof result.error !== "string") {
+      expect(result.error.typeId).toBeDefined();
+    }
+    expect(mockCreateItemQuery).not.toHaveBeenCalled();
+  });
+
+  it("returns validation errors for invalid URL", async () => {
+    mockAuth.mockResolvedValue({ user: { id: "user-1" } });
+
+    const result = await createItem({
+      title: "Test",
+      typeId: "type-1",
+      url: "not-a-url",
+      tags: [],
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success && typeof result.error !== "string") {
+      expect(result.error.url).toBeDefined();
+    }
+  });
+
+  it("creates item on success", async () => {
+    mockAuth.mockResolvedValue({ user: { id: "user-1" } });
+    mockCreateItemQuery.mockResolvedValue(fakeItem);
+
+    const result = await createItem({
+      title: "New Snippet",
+      description: "A snippet",
+      content: "console.log('hello')",
+      language: "javascript",
+      typeId: "type-1",
+      tags: ["react", "hooks"],
+    });
+
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data).toEqual(fakeItem);
+    }
+    expect(mockCreateItemQuery).toHaveBeenCalledWith("user-1", {
+      title: "New Snippet",
+      description: "A snippet",
+      content: "console.log('hello')",
+      url: null,
+      language: "javascript",
+      typeId: "type-1",
+      tags: ["react", "hooks"],
+    });
+  });
+
+  it("transforms empty URL to null", async () => {
+    mockAuth.mockResolvedValue({ user: { id: "user-1" } });
+    mockCreateItemQuery.mockResolvedValue(fakeItem);
+
+    await createItem({
+      title: "Link",
+      typeId: "type-1",
+      url: "",
+      tags: [],
+    });
+
+    expect(mockCreateItemQuery).toHaveBeenCalledWith(
+      "user-1",
+      expect.objectContaining({ url: null })
+    );
+  });
+});
 
 describe("updateItem", () => {
   beforeEach(() => {

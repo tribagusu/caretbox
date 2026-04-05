@@ -25,7 +25,7 @@ export default async function ItemsLayout({
     <SidebarProvider>
       <ItemDrawerProvider>
         <div className="flex h-screen flex-col">
-          <TopBar />
+          <TopBar itemTypes={sidebarItemTypes} />
           <DashboardShell
             sidebarItemTypes={sidebarItemTypes}
             sidebarCollections={sidebarCollections}

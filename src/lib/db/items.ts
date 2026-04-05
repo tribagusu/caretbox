@@ -215,6 +215,66 @@ export async function updateItem(
   };
 }
 
+export interface CreateItemData {
+  title: string;
+  description: string | null;
+  content: string | null;
+  url: string | null;
+  language: string | null;
+  typeId: string;
+  tags: string[];
+}
+
+export async function createItem(
+  userId: string,
+  data: CreateItemData
+): Promise<ItemDetail> {
+  const created = await prisma.item.create({
+    data: {
+      title: data.title,
+      description: data.description,
+      content: data.content,
+      contentType: "text",
+      url: data.url,
+      language: data.language,
+      userId,
+      typeId: data.typeId,
+      tags: {
+        create: data.tags.map((tagName) => ({
+          tag: {
+            connectOrCreate: {
+              where: { name_userId: { name: tagName, userId } },
+              create: { name: tagName, userId },
+            },
+          },
+        })),
+      },
+    },
+    include: {
+      type: { select: { name: true, icon: true, color: true } },
+      tags: { select: { tag: { select: { id: true, name: true } } } },
+      collection: { select: { id: true, name: true } },
+    },
+  });
+
+  return {
+    id: created.id,
+    title: created.title,
+    description: created.description,
+    content: created.content,
+    contentType: created.contentType,
+    url: created.url,
+    language: created.language,
+    isFavorite: created.isFavorite,
+    isPinned: created.isPinned,
+    createdAt: created.createdAt,
+    updatedAt: created.updatedAt,
+    type: created.type,
+    tags: created.tags.map((t) => t.tag),
+    collection: created.collection,
+  };
+}
+
 export async function deleteItem(userId: string, id: string): Promise<boolean> {
   const item = await prisma.item.findUnique({
     where: { id, userId },
