@@ -2,30 +2,16 @@
 
 ## Status
 
-In Progress
+Completed
 
 ## Goals
 
-- Modal dialog for creating new items, triggered from "New Item" button in top bar
-- Type selector with dynamic fields based on selected type
-- Server action with Zod validation
-- Query function in lib/db/items.ts
-- Toast feedback, modal close, and list refresh on success
-
 ## Notes
 
-- Use shadcn Dialog component
-- Type selector: snippet, prompt, command, note, link
-- Fields by type:
-  - All types: title (required), description, tags
-  - snippet/command: content, language
-  - prompt/note: content
-  - link: URL (required)
-- Server action `createItem` with Zod validation
-- Query function `createItem` in `lib/db/items.ts`
-- Toast on success, close modal and refresh
-
 ## History
+
+- **2026-04-05** — Item Create: "New Item" button in top bar opens shadcn Dialog modal with type selector (snippet, prompt, command, note, link) and dynamic fields based on selected type — all types get title (required), description, tags; snippet/command get content + language; prompt/note get content; link gets URL. Server action createItem() in src/actions/items.ts with Zod validation and auth check, returns field errors to client. Query function createItem() in src/lib/db/items.ts creates item with tag connect-or-create. CreateItemDialog component manages form state, toast on success/error, closes modal and refreshes on success. TopBar receives itemTypes prop from both dashboard and items layouts. Installed shadcn dialog component. Added 6 tests for createItem action (unauthorized, empty title, missing typeId, invalid URL, success, empty URL transform). New files: src/components/items/CreateItemDialog.tsx, src/components/ui/dialog.tsx, context/features/item-create-spec.md.
+
 
 - **2026-04-05** — Item Delete: Delete button in item drawer action bar opens ShadCN AlertDialog confirmation dialog. On confirm, deletes item via deleteItem() server action in src/actions/items.ts with auth/ownership check. Query function deleteItem() in src/lib/db/items.ts uses Prisma cascade for ItemTag cleanup. Drawer closes after successful delete, toast notification on success/error, router.refresh() updates underlying list. ItemDrawerProvider passes onItemDeleted callback to clear drawer state. Added 3 tests for deleteItem action (unauthorized, not found, success).
 
