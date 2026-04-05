@@ -10,6 +10,8 @@ Completed
 
 ## History
 
+- **2026-04-05** — Vitest Setup: Installed vitest for unit testing server actions and utilities (not components). Config at vitest.config.ts with node environment, @/ path alias, includes src/**/*.test.ts, excludes src/components/** and src/app/**. Added npm scripts: test (single run), test:watch. Updated CLAUDE.md with test commands, ai-interaction.md workflow step 4, and coding-standards.md with Testing section.
+
 - **2026-04-05** — Items List View: Created dynamic route /items/[type] displaying type-filtered items in a responsive 2-column grid. New files: src/app/items/[type]/page.tsx (server component with type validation via getSystemItemTypes, notFound() for invalid types, empty state), src/app/items/layout.tsx (shared DashboardShell layout with sidebar), src/components/items/ItemCard.tsx (grid card with colored left border, icon badge, tags, pin/favorite indicators). Added getItemsByType() to src/lib/db/items.ts with case-insensitive type matching. Protected /items routes via proxy.ts.
 
 - **2026-04-04** — Profile Page: Created /profile page (protected via proxy.ts) with user info (name, email, avatar via UserAvatar, join date), usage stats (total items, total collections, per-type breakdown with icons), change password form (credentials users only, validates current password), and delete account with ShadCN AlertDialog confirmation and Loader2 spinner. Uses Prisma cascade delete for account removal. New files: src/lib/db/profile.ts (getProfileData, getProfileStats), src/app/profile/page.tsx, src/components/profile/ProfileContent.tsx, API routes POST /api/auth/change-password and DELETE /api/auth/account. Installed ShadCN alert-dialog component.
