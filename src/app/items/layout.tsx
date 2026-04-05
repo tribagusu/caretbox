@@ -11,11 +11,15 @@ export default async function ItemsLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [sidebarItemTypes, sidebarCollections, session] = await Promise.all([
-    getSystemItemTypes(),
-    getRecentCollections(),
-    auth(),
-  ]);
+  const session = await auth();
+  const userId = session?.user?.id;
+
+  const [sidebarItemTypes, sidebarCollections] = userId
+    ? await Promise.all([
+        getSystemItemTypes(userId),
+        getRecentCollections(userId),
+      ])
+    : [[], []];
 
   return (
     <SidebarProvider>

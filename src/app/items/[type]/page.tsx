@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getItemsByType, getSystemItemTypes } from "@/lib/db/items";
 import { getIcon } from "@/lib/icons";
 import { ItemCard } from "@/components/items/ItemCard";
+import { auth } from "@/auth";
 
 interface ItemsPageProps {
   params: Promise<{ type: string }>;
@@ -10,14 +11,18 @@ interface ItemsPageProps {
 export default async function ItemsPage({ params }: ItemsPageProps) {
   const { type } = await params;
 
-  const itemTypes = await getSystemItemTypes();
+  const session = await auth();
+  const userId = session?.user?.id;
+  if (!userId) return null;
+
+  const itemTypes = await getSystemItemTypes(userId);
   const itemType = itemTypes.find(
     (t) => t.name.toLowerCase() === type.toLowerCase()
   );
 
   if (!itemType) notFound();
 
-  const items = await getItemsByType(itemType.name);
+  const items = await getItemsByType(userId, itemType.name);
   const TypeIcon = getIcon(itemType.icon ?? "file");
   const color = itemType.color ?? "#6366f1";
 

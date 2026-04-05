@@ -1,7 +1,5 @@
 import { prisma } from "@/lib/prisma";
 
-const DEMO_USER_EMAIL = "demo@devstash.io";
-
 export interface DashboardItem {
   id: string;
   title: string;
@@ -15,14 +13,6 @@ export interface DashboardItem {
     color: string | null;
   };
   tags: { id: string; name: string }[];
-}
-
-async function getDemoUserId(): Promise<string | null> {
-  const user = await prisma.user.findUnique({
-    where: { email: DEMO_USER_EMAIL },
-    select: { id: true },
-  });
-  return user?.id ?? null;
 }
 
 const itemInclude = {
@@ -49,10 +39,7 @@ function mapItem(
   };
 }
 
-export async function getPinnedItems(): Promise<DashboardItem[]> {
-  const userId = await getDemoUserId();
-  if (!userId) return [];
-
+export async function getPinnedItems(userId: string): Promise<DashboardItem[]> {
   const items = await prisma.item.findMany({
     where: { userId, isPinned: true },
     orderBy: { updatedAt: "desc" },
@@ -62,10 +49,7 @@ export async function getPinnedItems(): Promise<DashboardItem[]> {
   return items.map(mapItem);
 }
 
-export async function getRecentItems(limit = 10): Promise<DashboardItem[]> {
-  const userId = await getDemoUserId();
-  if (!userId) return [];
-
+export async function getRecentItems(userId: string, limit = 10): Promise<DashboardItem[]> {
   const items = await prisma.item.findMany({
     where: { userId },
     orderBy: { createdAt: "desc" },
@@ -76,10 +60,7 @@ export async function getRecentItems(limit = 10): Promise<DashboardItem[]> {
   return items.map(mapItem);
 }
 
-export async function getItemStats() {
-  const userId = await getDemoUserId();
-  if (!userId) return { totalItems: 0, favoriteItems: 0 };
-
+export async function getItemStats(userId: string) {
   const [totalItems, favoriteItems] = await Promise.all([
     prisma.item.count({ where: { userId } }),
     prisma.item.count({ where: { userId, isFavorite: true } }),
@@ -97,11 +78,9 @@ export interface SidebarItemType {
 }
 
 export async function getItemsByType(
+  userId: string,
   typeName: string
 ): Promise<DashboardItem[]> {
-  const userId = await getDemoUserId();
-  if (!userId) return [];
-
   const items = await prisma.item.findMany({
     where: {
       userId,
@@ -136,11 +115,9 @@ export interface ItemDetail {
 }
 
 export async function getItemById(
+  userId: string,
   id: string
 ): Promise<ItemDetail | null> {
-  const userId = await getDemoUserId();
-  if (!userId) return null;
-
   const item = await prisma.item.findUnique({
     where: { id, userId },
     include: {
@@ -170,10 +147,75 @@ export async function getItemById(
   };
 }
 
-export async function getSystemItemTypes(): Promise<SidebarItemType[]> {
-  const userId = await getDemoUserId();
-  if (!userId) return [];
+export interface UpdateItemData {
+  title: string;
+  description: string | null;
+  content: string | null;
+  url: string | null;
+  language: string | null;
+  tags: string[];
+}
 
+export async function updateItem(
+  userId: string,
+  id: string,
+  data: UpdateItemData
+): Promise<ItemDetail | null> {
+  const item = await prisma.item.findUnique({
+    where: { id, userId },
+    select: { id: true },
+  });
+
+  if (!item) return null;
+
+  const updated = await prisma.item.update({
+    where: { id },
+    data: {
+      title: data.title,
+      description: data.description,
+      content: data.content,
+      url: data.url,
+      language: data.language,
+      tags: {
+        deleteMany: {},
+        create: data.tags.map((tagName) => ({
+          tag: {
+            connectOrCreate: {
+              where: {
+                name_userId: { name: tagName, userId },
+              },
+              create: { name: tagName, userId },
+            },
+          },
+        })),
+      },
+    },
+    include: {
+      type: { select: { name: true, icon: true, color: true } },
+      tags: { select: { tag: { select: { id: true, name: true } } } },
+      collection: { select: { id: true, name: true } },
+    },
+  });
+
+  return {
+    id: updated.id,
+    title: updated.title,
+    description: updated.description,
+    content: updated.content,
+    contentType: updated.contentType,
+    url: updated.url,
+    language: updated.language,
+    isFavorite: updated.isFavorite,
+    isPinned: updated.isPinned,
+    createdAt: updated.createdAt,
+    updatedAt: updated.updatedAt,
+    type: updated.type,
+    tags: updated.tags.map((t) => t.tag),
+    collection: updated.collection,
+  };
+}
+
+export async function getSystemItemTypes(userId: string): Promise<SidebarItemType[]> {
   const itemTypes = await prisma.itemType.findMany({
     where: { isSystem: true },
     include: {
