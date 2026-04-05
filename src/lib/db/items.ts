@@ -114,6 +114,62 @@ export async function getItemsByType(
   return items.map(mapItem);
 }
 
+export interface ItemDetail {
+  id: string;
+  title: string;
+  description: string | null;
+  content: string | null;
+  contentType: string;
+  url: string | null;
+  language: string | null;
+  isFavorite: boolean;
+  isPinned: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  type: {
+    name: string;
+    icon: string | null;
+    color: string | null;
+  };
+  tags: { id: string; name: string }[];
+  collection: { id: string; name: string } | null;
+}
+
+export async function getItemById(
+  id: string
+): Promise<ItemDetail | null> {
+  const userId = await getDemoUserId();
+  if (!userId) return null;
+
+  const item = await prisma.item.findUnique({
+    where: { id, userId },
+    include: {
+      type: { select: { name: true, icon: true, color: true } },
+      tags: { select: { tag: { select: { id: true, name: true } } } },
+      collection: { select: { id: true, name: true } },
+    },
+  });
+
+  if (!item) return null;
+
+  return {
+    id: item.id,
+    title: item.title,
+    description: item.description,
+    content: item.content,
+    contentType: item.contentType,
+    url: item.url,
+    language: item.language,
+    isFavorite: item.isFavorite,
+    isPinned: item.isPinned,
+    createdAt: item.createdAt,
+    updatedAt: item.updatedAt,
+    type: item.type,
+    tags: item.tags.map((t) => t.tag),
+    collection: item.collection,
+  };
+}
+
 export async function getSystemItemTypes(): Promise<SidebarItemType[]> {
   const userId = await getDemoUserId();
   if (!userId) return [];

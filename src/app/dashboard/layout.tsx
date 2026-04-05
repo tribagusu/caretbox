@@ -1,4 +1,5 @@
 import { SidebarProvider } from "@/components/dashboard/SidebarContext";
+import { ItemDrawerProvider } from "@/components/items/ItemDrawerProvider";
 import { TopBar } from "@/components/dashboard/TopBar";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { getSystemItemTypes } from "@/lib/db/items";
@@ -18,16 +19,18 @@ export default async function DashboardLayout({
 
   return (
     <SidebarProvider>
-      <div className="flex h-screen flex-col">
-        <TopBar />
-        <DashboardShell
-          sidebarItemTypes={sidebarItemTypes}
-          sidebarCollections={sidebarCollections}
-          user={session?.user}
-        >
-          {children}
-        </DashboardShell>
-      </div>
+      <ItemDrawerProvider>
+        <div className="flex h-screen flex-col">
+          <TopBar />
+          <DashboardShell
+            sidebarItemTypes={sidebarItemTypes}
+            sidebarCollections={sidebarCollections}
+            user={session?.user}
+          >
+            {children}
+          </DashboardShell>
+        </div>
+      </ItemDrawerProvider>
     </SidebarProvider>
   );
 }

@@ -1,5 +1,8 @@
+"use client";
+
 import { Star, Pin } from "lucide-react";
 import { getIcon } from "@/lib/icons";
+import { useItemDrawer } from "@/components/items/ItemDrawerProvider";
 import type { DashboardItem } from "@/lib/db/items";
 
 interface ItemRowProps {
@@ -9,11 +12,13 @@ interface ItemRowProps {
 export function ItemRow({ item }: ItemRowProps) {
   const TypeIcon = getIcon(item.type.icon ?? "file");
   const color = item.type.color ?? "#6366f1";
+  const { openItem } = useItemDrawer();
 
   return (
     <div
-      className="flex items-center gap-3 rounded-lg border border-border border-l-2 bg-card px-4 py-3 transition-colors hover:border-muted-foreground/30"
+      className="cursor-pointer flex items-center gap-3 rounded-lg border border-border border-l-2 bg-card px-4 py-3 transition-colors hover:border-muted-foreground/30"
       style={{ borderLeftColor: color }}
+      onClick={() => openItem(item.id)}
     >
       <div
         className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
