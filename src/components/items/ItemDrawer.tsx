@@ -21,6 +21,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { getIcon } from "@/lib/icons";
+import { CodeEditor } from "@/components/items/CodeEditor";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { updateItem, deleteItem } from "@/actions/items";
@@ -401,13 +402,21 @@ export function ItemDrawer({
                   <h3 className="mb-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     Content
                   </h3>
-                  <textarea
-                    value={form.content}
-                    onChange={(e) => updateField("content", e.target.value)}
-                    rows={8}
-                    className={`${inputClass} font-mono`}
-                    placeholder="Content"
-                  />
+                  {showLanguage ? (
+                    <CodeEditor
+                      value={form.content}
+                      onChange={(val) => updateField("content", val)}
+                      language={form.language || undefined}
+                    />
+                  ) : (
+                    <textarea
+                      value={form.content}
+                      onChange={(e) => updateField("content", e.target.value)}
+                      rows={8}
+                      className={`${inputClass} font-mono`}
+                      placeholder="Content"
+                    />
+                  )}
                 </section>
               ) : (
                 !editing &&
@@ -416,9 +425,17 @@ export function ItemDrawer({
                     <h3 className="mb-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
                       Content
                     </h3>
-                    <pre className="overflow-x-auto rounded-lg border border-border bg-muted/50 p-4 text-sm">
-                      <code>{item.content}</code>
-                    </pre>
+                    {showLanguage ? (
+                      <CodeEditor
+                        value={item.content}
+                        language={item.language ?? undefined}
+                        readOnly
+                      />
+                    ) : (
+                      <pre className="overflow-x-auto rounded-lg border border-border bg-muted/50 p-4 text-sm">
+                        <code>{item.content}</code>
+                      </pre>
+                    )}
                   </section>
                 )
               )}

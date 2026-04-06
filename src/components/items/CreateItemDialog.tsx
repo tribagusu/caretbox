@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
+import { CodeEditor } from "@/components/items/CodeEditor";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { createItem } from "@/actions/items";
@@ -18,6 +19,7 @@ interface CreateItemDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   itemTypes: SidebarItemType[];
+  defaultTypeId?: string;
 }
 
 const CONTENT_TYPES = ["snippet", "prompt", "command", "note"];
@@ -48,9 +50,13 @@ export function CreateItemDialog({
   open,
   onOpenChange,
   itemTypes,
+  defaultTypeId,
 }: CreateItemDialogProps) {
   const router = useRouter();
-  const [form, setForm] = useState<FormState>(initialForm);
+  const [form, setForm] = useState<FormState>({
+    ...initialForm,
+    typeId: defaultTypeId ?? "",
+  });
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [saving, setSaving] = useState(false);
 
@@ -62,7 +68,7 @@ export function CreateItemDialog({
 
   const handleOpenChange = (value: boolean) => {
     if (!value) {
-      setForm(initialForm);
+      setForm({ ...initialForm, typeId: defaultTypeId ?? "" });
       setErrors({});
     }
     onOpenChange(value);
@@ -173,13 +179,21 @@ export function CreateItemDialog({
           {showContent && (
             <div className="space-y-1.5">
               <label className="text-sm font-medium">Content</label>
-              <textarea
-                value={form.content}
-                onChange={(e) => updateField("content", e.target.value)}
-                rows={5}
-                className={`${inputClass} font-mono`}
-                placeholder="Content"
-              />
+              {showLanguage ? (
+                <CodeEditor
+                  value={form.content}
+                  onChange={(val) => updateField("content", val)}
+                  language={form.language || undefined}
+                />
+              ) : (
+                <textarea
+                  value={form.content}
+                  onChange={(e) => updateField("content", e.target.value)}
+                  rows={5}
+                  className={`${inputClass} font-mono`}
+                  placeholder="Content"
+                />
+              )}
             </div>
           )}
 
