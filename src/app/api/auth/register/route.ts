@@ -1,26 +1,32 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { generateVerificationToken } from "@/lib/tokens";
 import { sendVerificationEmail } from "@/lib/email";
 
+const registerSchema = z
+  .object({
+    name: z.string().trim().min(1, "Name is required"),
+    email: z.email("Invalid email address"),
+    password: z.string().min(8, "Password must be at least 8 characters"),
+    confirmPassword: z.string(),
+  })
+  .refine((d) => d.password === d.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
+
 export async function POST(request: Request) {
   const body = await request.json();
-  const { name, email, password, confirmPassword } = body;
 
-  if (!name || !email || !password || !confirmPassword) {
-    return NextResponse.json(
-      { error: "All fields are required" },
-      { status: 400 }
-    );
+  const parsed = registerSchema.safeParse(body);
+  if (!parsed.success) {
+    const firstError = parsed.error.issues[0]?.message ?? "Invalid input";
+    return NextResponse.json({ error: firstError }, { status: 400 });
   }
 
-  if (password !== confirmPassword) {
-    return NextResponse.json(
-      { error: "Passwords do not match" },
-      { status: 400 }
-    );
-  }
+  const { name, email, password } = parsed.data;
 
   const existingUser = await prisma.user.findUnique({ where: { email } });
   if (existingUser) {

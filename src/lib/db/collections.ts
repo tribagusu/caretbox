@@ -21,11 +21,13 @@ export const getRecentCollections = cache(async function getRecentCollections(us
     orderBy: { updatedAt: "desc" },
     take: 10,
     include: {
+      _count: { select: { items: true } },
       items: {
         select: {
           typeId: true,
           type: { select: { icon: true, color: true } },
         },
+        take: 50,
       },
     },
   });
@@ -64,7 +66,7 @@ export const getRecentCollections = cache(async function getRecentCollections(us
       name: collection.name,
       description: collection.description,
       isFavorite: collection.isFavorite,
-      itemCount: collection.items.length,
+      itemCount: collection._count.items,
       typeIcons,
       dominantColor,
       createdAt: collection.createdAt,

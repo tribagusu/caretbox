@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import { deleteFromR2 } from "@/lib/r2";
 
@@ -46,10 +47,11 @@ function mapItem(
   };
 }
 
-export async function getPinnedItems(userId: string): Promise<DashboardItem[]> {
+export async function getPinnedItems(userId: string, limit = 20): Promise<DashboardItem[]> {
   const items = await prisma.item.findMany({
     where: { userId, isPinned: true },
     orderBy: { updatedAt: "desc" },
+    take: limit,
     include: itemInclude,
   });
 
@@ -249,6 +251,15 @@ export async function createItem(
   userId: string,
   data: CreateItemData
 ): Promise<ItemDetail> {
+  const typeExists = await prisma.itemType.findFirst({
+    where: { id: data.typeId, OR: [{ isSystem: true }, { userId }] },
+    select: { id: true },
+  });
+
+  if (!typeExists) {
+    throw new Error("Invalid item type");
+  }
+
   const created = await prisma.item.create({
     data: {
       title: data.title,
@@ -323,7 +334,7 @@ export async function deleteItem(userId: string, id: string): Promise<boolean> {
   return true;
 }
 
-export async function getSystemItemTypes(userId: string): Promise<SidebarItemType[]> {
+export const getSystemItemTypes = cache(async function getSystemItemTypes(userId: string): Promise<SidebarItemType[]> {
   const itemTypes = await prisma.itemType.findMany({
     where: { isSystem: true },
     include: {
@@ -341,4 +352,4 @@ export async function getSystemItemTypes(userId: string): Promise<SidebarItemTyp
     color: type.color,
     count: type._count.items,
   }));
-}
+});

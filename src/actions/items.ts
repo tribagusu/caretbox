@@ -49,21 +49,28 @@ export async function createItem(data: CreateItemInput) {
     return { success: false as const, error: fieldErrors };
   }
 
-  const created = await createItemQuery(session.user.id, {
-    title: parsed.data.title,
-    description: parsed.data.description ?? null,
-    content: parsed.data.content ?? null,
-    contentType: parsed.data.contentType,
-    fileUrl: parsed.data.fileUrl ?? null,
-    fileName: parsed.data.fileName ?? null,
-    fileSize: parsed.data.fileSize ?? null,
-    url: parsed.data.url ?? null,
-    language: parsed.data.language ?? null,
-    typeId: parsed.data.typeId,
-    tags: parsed.data.tags,
-  });
+  try {
+    const created = await createItemQuery(session.user.id, {
+      title: parsed.data.title,
+      description: parsed.data.description ?? null,
+      content: parsed.data.content ?? null,
+      contentType: parsed.data.contentType,
+      fileUrl: parsed.data.fileUrl ?? null,
+      fileName: parsed.data.fileName ?? null,
+      fileSize: parsed.data.fileSize ?? null,
+      url: parsed.data.url ?? null,
+      language: parsed.data.language ?? null,
+      typeId: parsed.data.typeId,
+      tags: parsed.data.tags,
+    });
 
-  return { success: true as const, data: created };
+    return { success: true as const, data: created };
+  } catch (err) {
+    if (err instanceof Error && err.message === "Invalid item type") {
+      return { success: false as const, error: "Invalid item type" };
+    }
+    throw err;
+  }
 }
 
 const updateItemSchema = z.object({

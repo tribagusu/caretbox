@@ -2,9 +2,25 @@
 
 ## Status
 
-Completed
+In Progress
 
 ## Goals
+
+Fix critical and high-severity issues found during codebase audit.
+
+### Critical
+
+1. **Registration server-side validation** — Add Zod schema to `/api/auth/register` for email format, password length (min 8), and confirm match. Currently only checks field presence.
+
+2. **typeId ownership check on item creation** — Verify `typeId` belongs to a system type or the user's own custom type before creating an item. Prevents cross-user type reference.
+
+### High
+
+3. **Cache `getSystemItemTypes` with `React.cache`** — Called in both items layout and page without caching, causing duplicate DB queries per render.
+
+4. **Add row limit to `getPinnedItems`** — No `take` clause; unbounded query as pinned items grow.
+
+5. **Use `_count` in `getRecentCollections`** — Currently loads all item rows per collection just to compute `items.length`. Use Prisma `_count` instead.
 
 ## Notes
 
