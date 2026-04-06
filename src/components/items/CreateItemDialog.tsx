@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { CodeEditor } from "@/components/items/CodeEditor";
+import { MarkdownEditor } from "@/components/items/MarkdownEditor";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { createItem } from "@/actions/items";
@@ -24,6 +25,7 @@ interface CreateItemDialogProps {
 
 const CONTENT_TYPES = ["snippet", "prompt", "command", "note"];
 const LANGUAGE_TYPES = ["snippet", "command"];
+const MARKDOWN_TYPES = ["note", "prompt"];
 const URL_TYPES = ["link"];
 
 interface FormState {
@@ -184,6 +186,11 @@ export function CreateItemDialog({
                   value={form.content}
                   onChange={(val) => updateField("content", val)}
                   language={form.language || undefined}
+                />
+              ) : MARKDOWN_TYPES.includes(typeName) ? (
+                <MarkdownEditor
+                  value={form.content}
+                  onChange={(val) => updateField("content", val)}
                 />
               ) : (
                 <textarea

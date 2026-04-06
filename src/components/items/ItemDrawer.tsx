@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { getIcon } from "@/lib/icons";
 import { CodeEditor } from "@/components/items/CodeEditor";
+import { MarkdownEditor } from "@/components/items/MarkdownEditor";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { updateItem, deleteItem } from "@/actions/items";
@@ -103,6 +104,7 @@ function ActionButton({
 
 const CONTENT_TYPES = ["snippet", "prompt", "command", "note"];
 const LANGUAGE_TYPES = ["snippet", "command"];
+const MARKDOWN_TYPES = ["note", "prompt"];
 const URL_TYPES = ["link"];
 
 interface EditFormState {
@@ -408,6 +410,11 @@ export function ItemDrawer({
                       onChange={(val) => updateField("content", val)}
                       language={form.language || undefined}
                     />
+                  ) : MARKDOWN_TYPES.includes(typeName) ? (
+                    <MarkdownEditor
+                      value={form.content}
+                      onChange={(val) => updateField("content", val)}
+                    />
                   ) : (
                     <textarea
                       value={form.content}
@@ -431,6 +438,8 @@ export function ItemDrawer({
                         language={item.language ?? undefined}
                         readOnly
                       />
+                    ) : MARKDOWN_TYPES.includes(typeName) ? (
+                      <MarkdownEditor value={item.content} readOnly />
                     ) : (
                       <pre className="overflow-x-auto rounded-lg border border-border bg-muted/50 p-4 text-sm">
                         <code>{item.content}</code>
