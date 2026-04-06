@@ -15,6 +15,13 @@ import { FileUpload } from "@/components/items/FileUpload";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { createItem } from "@/actions/items";
+import {
+  CONTENT_TYPES,
+  LANGUAGE_TYPES,
+  MARKDOWN_TYPES,
+  URL_TYPES,
+  FORM_INPUT_CLASS,
+} from "@/lib/item-constants";
 import type { SidebarItemType } from "@/lib/db/items";
 
 interface CreateItemDialogProps {
@@ -23,13 +30,6 @@ interface CreateItemDialogProps {
   itemTypes: SidebarItemType[];
   defaultTypeId?: string;
 }
-
-const CONTENT_TYPES = ["snippet", "prompt", "command", "note"];
-const LANGUAGE_TYPES = ["snippet", "command"];
-const MARKDOWN_TYPES = ["note", "prompt"];
-const URL_TYPES = ["link"];
-const FILE_TYPES = ["file"];
-const IMAGE_TYPES = ["image"];
 
 interface FormState {
   title: string;
@@ -76,8 +76,8 @@ export function CreateItemDialog({
   const showContent = CONTENT_TYPES.includes(typeName);
   const showLanguage = LANGUAGE_TYPES.includes(typeName);
   const showUrl = URL_TYPES.includes(typeName);
-  const showFile = FILE_TYPES.includes(typeName);
-  const showImage = IMAGE_TYPES.includes(typeName);
+  const showFile = typeName === "file";
+  const showImage = typeName === "image";
   const needsFile = showFile || showImage;
 
   const handleOpenChange = (value: boolean) => {
@@ -135,9 +135,6 @@ export function CreateItemDialog({
     router.refresh();
   };
 
-  const inputClass =
-    "w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring";
-
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-lg">
@@ -152,7 +149,7 @@ export function CreateItemDialog({
             <select
               value={form.typeId}
               onChange={(e) => updateField("typeId", e.target.value)}
-              className={inputClass}
+              className={FORM_INPUT_CLASS}
             >
               <option value="">Select a type...</option>
               {itemTypes.map((type) => (
@@ -173,7 +170,7 @@ export function CreateItemDialog({
               type="text"
               value={form.title}
               onChange={(e) => updateField("title", e.target.value)}
-              className={inputClass}
+              className={FORM_INPUT_CLASS}
               placeholder="Item title"
             />
             {errors.title && (
@@ -188,7 +185,7 @@ export function CreateItemDialog({
               value={form.description}
               onChange={(e) => updateField("description", e.target.value)}
               rows={2}
-              className={inputClass}
+              className={FORM_INPUT_CLASS}
               placeholder="Optional description"
             />
           </div>
@@ -213,7 +210,7 @@ export function CreateItemDialog({
                   value={form.content}
                   onChange={(e) => updateField("content", e.target.value)}
                   rows={5}
-                  className={`${inputClass} font-mono`}
+                  className={`${FORM_INPUT_CLASS} font-mono`}
                   placeholder="Content"
                 />
               )}
@@ -228,7 +225,7 @@ export function CreateItemDialog({
                 type="text"
                 value={form.language}
                 onChange={(e) => updateField("language", e.target.value)}
-                className={inputClass}
+                className={FORM_INPUT_CLASS}
                 placeholder="e.g. javascript, python"
               />
             </div>
@@ -242,7 +239,7 @@ export function CreateItemDialog({
                 type="text"
                 value={form.url}
                 onChange={(e) => updateField("url", e.target.value)}
-                className={inputClass}
+                className={FORM_INPUT_CLASS}
                 placeholder="https://example.com"
               />
               {errors.url && (
@@ -274,7 +271,7 @@ export function CreateItemDialog({
               type="text"
               value={form.tags}
               onChange={(e) => updateField("tags", e.target.value)}
-              className={inputClass}
+              className={FORM_INPUT_CLASS}
               placeholder="react, hooks, state (comma-separated)"
             />
           </div>

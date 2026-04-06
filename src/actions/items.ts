@@ -8,6 +8,22 @@ import {
   deleteItem as deleteItemQuery,
 } from "@/lib/db/items";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-unknown -- Zod v4 treeifyError uses untyped tree structure
+function extractFieldErrors(error: z.ZodError): Record<string, string[]> {
+  const tree = z.treeifyError(error) as {
+    properties?: Record<string, { errors?: string[] }>;
+  };
+  const fieldErrors: Record<string, string[]> = {};
+  if (tree.properties) {
+    for (const [key, node] of Object.entries(tree.properties)) {
+      if (node?.errors?.length) {
+        fieldErrors[key] = node.errors;
+      }
+    }
+  }
+  return fieldErrors;
+}
+
 const createItemSchema = z.object({
   title: z.string().trim().min(1, "Title is required"),
   description: z.string().trim().nullable().optional().default(null),
@@ -37,16 +53,7 @@ export async function createItem(data: CreateItemInput) {
 
   const parsed = createItemSchema.safeParse(data);
   if (!parsed.success) {
-    const tree = z.treeifyError(parsed.error);
-    const fieldErrors: Record<string, string[]> = {};
-    if (tree.properties) {
-      for (const [key, node] of Object.entries(tree.properties)) {
-        if (node?.errors?.length) {
-          fieldErrors[key] = node.errors;
-        }
-      }
-    }
-    return { success: false as const, error: fieldErrors };
+    return { success: false as const, error: extractFieldErrors(parsed.error) };
   }
 
   try {
@@ -97,16 +104,7 @@ export async function updateItem(itemId: string, data: UpdateItemInput) {
 
   const parsed = updateItemSchema.safeParse(data);
   if (!parsed.success) {
-    const tree = z.treeifyError(parsed.error);
-    const fieldErrors: Record<string, string[]> = {};
-    if (tree.properties) {
-      for (const [key, node] of Object.entries(tree.properties)) {
-        if (node?.errors?.length) {
-          fieldErrors[key] = node.errors;
-        }
-      }
-    }
-    return { success: false as const, error: fieldErrors };
+    return { success: false as const, error: extractFieldErrors(parsed.error) };
   }
 
   const updated = await updateItemQuery(session.user.id, itemId, {

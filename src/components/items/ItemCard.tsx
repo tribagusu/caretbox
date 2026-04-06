@@ -3,6 +3,7 @@
 import { Star, Pin } from "lucide-react";
 import { getIcon } from "@/lib/icons";
 import { useItemDrawer } from "@/components/items/ItemDrawerProvider";
+import { formatDateShort } from "@/lib/utils";
 import type { DashboardItem } from "@/lib/db/items";
 
 interface ItemCardProps {
@@ -62,10 +63,7 @@ export function ItemCard({ item }: ItemCardProps) {
           <div />
         )}
         <span className="shrink-0 text-xs text-muted-foreground">
-          {new Date(item.createdAt).toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-          })}
+          {formatDateShort(item.createdAt)}
         </span>
       </div>
     </div>

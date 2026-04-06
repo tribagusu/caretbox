@@ -13,6 +13,44 @@ export interface DashboardCollection {
   updatedAt: Date;
 }
 
+interface CollectionItem {
+  typeId: string;
+  type: { icon: string | null; color: string | null };
+}
+
+function computeCollectionMeta(items: CollectionItem[]): {
+  typeIcons: string[];
+  dominantColor: string | null;
+} {
+  const typeCounts = new Map<string, { icon: string; color: string | null; count: number }>();
+
+  for (const item of items) {
+    const existing = typeCounts.get(item.typeId);
+    if (existing) {
+      existing.count++;
+    } else {
+      typeCounts.set(item.typeId, {
+        icon: (item.type.icon ?? "file").toLowerCase(),
+        color: item.type.color ?? null,
+        count: 1,
+      });
+    }
+  }
+
+  const typeIcons = [...typeCounts.values()].map((t) => t.icon);
+
+  let dominantColor: string | null = null;
+  let maxCount = 0;
+  for (const t of typeCounts.values()) {
+    if (t.count > maxCount) {
+      maxCount = t.count;
+      dominantColor = t.color;
+    }
+  }
+
+  return { typeIcons, dominantColor };
+}
+
 // Cached: fetches up to 10 recent collections per request.
 // Callers slice the result to their desired limit.
 export const getRecentCollections = cache(async function getRecentCollections(userId: string): Promise<DashboardCollection[]> {
@@ -33,33 +71,7 @@ export const getRecentCollections = cache(async function getRecentCollections(us
   });
 
   return collections.map((collection) => {
-    const typeCounts = new Map<string, { icon: string; color: string | null; count: number }>();
-
-    for (const item of collection.items) {
-      const existing = typeCounts.get(item.typeId);
-      if (existing) {
-        existing.count++;
-      } else {
-        typeCounts.set(item.typeId, {
-          icon: (item.type.icon ?? "file").toLowerCase(),
-          color: item.type.color ?? null,
-          count: 1,
-        });
-      }
-    }
-
-    // Get unique type icons
-    const typeIcons = [...typeCounts.values()].map((t) => t.icon);
-
-    // Dominant color = color of the most-used content type
-    let dominantColor: string | null = null;
-    let maxCount = 0;
-    for (const t of typeCounts.values()) {
-      if (t.count > maxCount) {
-        maxCount = t.count;
-        dominantColor = t.color;
-      }
-    }
+    const { typeIcons, dominantColor } = computeCollectionMeta(collection.items);
 
     return {
       id: collection.id,

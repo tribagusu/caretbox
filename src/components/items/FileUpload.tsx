@@ -8,6 +8,7 @@ import {
   MAX_IMAGE_SIZE,
   MAX_FILE_SIZE,
 } from "@/lib/r2";
+import { formatFileSize } from "@/lib/utils";
 
 interface UploadResult {
   fileUrl: string;
@@ -19,12 +20,6 @@ interface FileUploadProps {
   isImage: boolean;
   onUploadComplete: (result: UploadResult) => void;
   onUploadError: (error: string) => void;
-}
-
-function formatFileSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 type Status = "idle" | "dragging" | "uploading" | "complete" | "error";

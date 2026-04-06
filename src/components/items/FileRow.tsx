@@ -2,6 +2,7 @@
 
 import { Download, FileText, FileImage, FileCode, FileSpreadsheet, File } from "lucide-react";
 import { useItemDrawer } from "@/components/items/ItemDrawerProvider";
+import { formatFileSize, formatDateShort } from "@/lib/utils";
 import type { DashboardItem } from "@/lib/db/items";
 
 interface FileRowProps {
@@ -37,13 +38,6 @@ function getFileIcon(fileName: string | null) {
   }
 }
 
-function formatFileSize(bytes: number | null): string {
-  if (bytes === null) return "—";
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
-
 export function FileRow({ item }: FileRowProps) {
   const { openItem } = useItemDrawer();
   const Icon = getFileIcon(item.fileName);
@@ -70,11 +64,7 @@ export function FileRow({ item }: FileRowProps) {
         <div className="mt-0.5 flex items-center gap-3 text-xs text-muted-foreground sm:hidden">
           <span>{formatFileSize(item.fileSize)}</span>
           <span>
-            {new Date(item.createdAt).toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-              year: "numeric",
-            })}
+            {formatDateShort(item.createdAt)}
           </span>
         </div>
       </div>

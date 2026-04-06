@@ -39,6 +39,15 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { formatFileSize, formatDateLong } from "@/lib/utils";
+import {
+  CONTENT_TYPES,
+  LANGUAGE_TYPES,
+  MARKDOWN_TYPES,
+  URL_TYPES,
+  FILE_UPLOAD_TYPES,
+  FORM_INPUT_CLASS,
+} from "@/lib/item-constants";
 import type { ItemDetail } from "@/lib/db/items";
 
 interface ItemDrawerProps {
@@ -104,16 +113,19 @@ function ActionButton({
   );
 }
 
-const CONTENT_TYPES = ["snippet", "prompt", "command", "note"];
-const LANGUAGE_TYPES = ["snippet", "command"];
-const MARKDOWN_TYPES = ["note", "prompt"];
-const URL_TYPES = ["link"];
-const FILE_UPLOAD_TYPES = ["file", "image"];
+function TypeBadge({ item }: { item: ItemDetail }) {
+  const TypeIcon = getIcon(item.type.icon ?? "file");
+  const color = item.type.color ?? "#6366f1";
 
-function formatFileSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  return (
+    <span
+      className="inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs"
+      style={{ backgroundColor: `${color}20`, color }}
+    >
+      <TypeIcon className="h-3 w-3" />
+      {item.type.name}
+    </span>
+  );
 }
 
 interface EditFormState {
@@ -135,6 +147,405 @@ function initFormState(item: ItemDetail): EditFormState {
     tags: item.tags.map((t) => t.name).join(", "),
   };
 }
+
+/* ── Action Bar ── */
+
+function DrawerEditActions({
+  saving,
+  disabled,
+  onSave,
+  onCancel,
+}: {
+  saving: boolean;
+  disabled: boolean;
+  onSave: () => void;
+  onCancel: () => void;
+}) {
+  return (
+    <div className="flex items-center gap-2 border-b border-border px-4 py-2">
+      <button
+        onClick={onSave}
+        disabled={saving || disabled}
+        className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
+      >
+        {saving ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : (
+          <Save className="h-4 w-4" />
+        )}
+        Save
+      </button>
+      <button
+        onClick={onCancel}
+        disabled={saving}
+        className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted"
+      >
+        <X className="h-4 w-4" />
+        Cancel
+      </button>
+    </div>
+  );
+}
+
+function DrawerViewActions({
+  item,
+  isFileType,
+  deleting,
+  onCopy,
+  onDownload,
+  onEdit,
+  onDelete,
+}: {
+  item: ItemDetail;
+  isFileType: boolean;
+  deleting: boolean;
+  onCopy: () => void;
+  onDownload: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  return (
+    <div className="flex items-center gap-1 border-b border-border px-4 py-2">
+      <ActionButton
+        icon={Star}
+        label="Favorite"
+        active={item.isFavorite}
+        activeColor="text-yellow-500"
+      />
+      <ActionButton
+        icon={Pin}
+        label="Pin"
+        active={item.isPinned}
+        activeColor="text-foreground"
+      />
+      <ActionButton icon={Copy} label="Copy" onClick={onCopy} />
+      {isFileType && item.fileUrl && (
+        <ActionButton
+          icon={Download}
+          label="Download"
+          onClick={onDownload}
+        />
+      )}
+
+      <div className="ml-auto flex items-center gap-1">
+        <ActionButton icon={Pencil} label="Edit" onClick={onEdit} />
+        <AlertDialog>
+          <AlertDialogTrigger
+            render={
+              <button className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-sm text-red-400 transition-colors hover:bg-red-500/10">
+                <Trash2 className="h-4 w-4" />
+                <span className="hidden sm:inline">Delete</span>
+              </button>
+            }
+          />
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete item?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will permanently delete &quot;{item.title}&quot;.
+                This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={onDelete}
+                disabled={deleting}
+                className="bg-red-600 hover:bg-red-700"
+              >
+                {deleting ? (
+                  <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+                ) : null}
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
+    </div>
+  );
+}
+
+/* ── Content Sections ── */
+
+function DrawerViewContent({
+  item,
+  typeName,
+}: {
+  item: ItemDetail;
+  typeName: string;
+}) {
+  const showLanguage = LANGUAGE_TYPES.includes(typeName);
+  const isFileType = FILE_UPLOAD_TYPES.includes(typeName);
+  const isImageType = typeName === "image";
+
+  return (
+    <div className="flex-1 space-y-6 overflow-y-auto p-4">
+      {/* Description */}
+      {item.description && (
+        <section>
+          <h3 className="mb-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            Description
+          </h3>
+          <p className="text-sm leading-relaxed">{item.description}</p>
+        </section>
+      )}
+
+      {/* Content */}
+      {item.content && (
+        <section>
+          <h3 className="mb-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            Content
+          </h3>
+          {showLanguage ? (
+            <CodeEditor
+              value={item.content}
+              language={item.language ?? undefined}
+              readOnly
+            />
+          ) : MARKDOWN_TYPES.includes(typeName) ? (
+            <MarkdownEditor value={item.content} readOnly />
+          ) : (
+            <pre className="overflow-x-auto rounded-lg border border-border bg-muted/50 p-4 text-sm">
+              <code>{item.content}</code>
+            </pre>
+          )}
+        </section>
+      )}
+
+      {/* File preview / info */}
+      {isFileType && item.fileUrl && (
+        <section>
+          <h3 className="mb-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            {isImageType ? "Image" : "File"}
+          </h3>
+          {isImageType ? (
+            <div className="space-y-2">
+              <img
+                src={`/api/files/${item.fileUrl}`}
+                alt={item.fileName ?? item.title}
+                className="max-h-64 rounded-md border border-border object-contain"
+              />
+              {item.fileName && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <span className="truncate">{item.fileName}</span>
+                  {item.fileSize && (
+                    <span className="text-xs text-muted-foreground/60">
+                      {formatFileSize(item.fileSize)}
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="flex items-center gap-3 rounded-lg border border-border bg-muted/50 p-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+                <File className="h-5 w-5 text-muted-foreground" />
+              </div>
+              <div>
+                <p className="text-sm">{item.fileName}</p>
+                {item.fileSize && (
+                  <p className="text-xs text-muted-foreground">
+                    {formatFileSize(item.fileSize)}
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* URL */}
+      {item.url && (
+        <section>
+          <h3 className="mb-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            URL
+          </h3>
+          <a
+            href={item.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="break-all text-sm text-blue-400 hover:underline"
+          >
+            {item.url}
+          </a>
+        </section>
+      )}
+
+      {/* Tags */}
+      {item.tags.length > 0 && (
+        <section>
+          <div className="mb-1.5 flex items-center gap-1.5">
+            <Tag className="h-3.5 w-3.5 text-muted-foreground" />
+            <h3 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              Tags
+            </h3>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {item.tags.map((tag) => (
+              <span
+                key={tag.id}
+                className="rounded-md bg-muted px-2.5 py-1 text-xs text-muted-foreground"
+              >
+                {tag.name}
+              </span>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Collection */}
+      {item.collection && (
+        <section>
+          <div className="mb-1.5 flex items-center gap-1.5">
+            <FolderOpen className="h-3.5 w-3.5 text-muted-foreground" />
+            <h3 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              Collections
+            </h3>
+          </div>
+          <span className="text-sm">{item.collection.name}</span>
+        </section>
+      )}
+
+      {/* Details */}
+      <section>
+        <div className="mb-1.5 flex items-center gap-1.5">
+          <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+          <h3 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            Details
+          </h3>
+        </div>
+        <div className="space-y-1 text-sm">
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">Created</span>
+            <span>{formatDateLong(item.createdAt)}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">Updated</span>
+            <span>{formatDateLong(item.updatedAt)}</span>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function DrawerEditContent({
+  form,
+  errors,
+  typeName,
+  updateField,
+}: {
+  form: EditFormState;
+  errors: Record<string, string[]>;
+  typeName: string;
+  updateField: (field: keyof EditFormState, value: string) => void;
+}) {
+  const showContent = CONTENT_TYPES.includes(typeName);
+  const showLanguage = LANGUAGE_TYPES.includes(typeName);
+  const showUrl = URL_TYPES.includes(typeName);
+
+  return (
+    <div className="flex-1 space-y-6 overflow-y-auto p-4">
+      {/* Description */}
+      <section>
+        <h3 className="mb-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+          Description
+        </h3>
+        <textarea
+          value={form.description}
+          onChange={(e) => updateField("description", e.target.value)}
+          rows={3}
+          className={FORM_INPUT_CLASS}
+          placeholder="Optional description"
+        />
+      </section>
+
+      {/* Content */}
+      {showContent && (
+        <section>
+          <h3 className="mb-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            Content
+          </h3>
+          {showLanguage ? (
+            <CodeEditor
+              value={form.content}
+              onChange={(val) => updateField("content", val)}
+              language={form.language || undefined}
+            />
+          ) : MARKDOWN_TYPES.includes(typeName) ? (
+            <MarkdownEditor
+              value={form.content}
+              onChange={(val) => updateField("content", val)}
+            />
+          ) : (
+            <textarea
+              value={form.content}
+              onChange={(e) => updateField("content", e.target.value)}
+              rows={8}
+              className={`${FORM_INPUT_CLASS} font-mono`}
+              placeholder="Content"
+            />
+          )}
+        </section>
+      )}
+
+      {/* Language */}
+      {showLanguage && (
+        <section>
+          <h3 className="mb-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            Language
+          </h3>
+          <input
+            type="text"
+            value={form.language}
+            onChange={(e) => updateField("language", e.target.value)}
+            className={FORM_INPUT_CLASS}
+            placeholder="e.g. javascript, python"
+          />
+        </section>
+      )}
+
+      {/* URL */}
+      {showUrl && (
+        <section>
+          <h3 className="mb-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            URL
+          </h3>
+          <input
+            type="text"
+            value={form.url}
+            onChange={(e) => updateField("url", e.target.value)}
+            className={FORM_INPUT_CLASS}
+            placeholder="https://example.com"
+          />
+          {errors.url && (
+            <p className="mt-1 text-xs text-red-400">{errors.url[0]}</p>
+          )}
+        </section>
+      )}
+
+      {/* Tags */}
+      <section>
+        <div className="mb-1.5 flex items-center gap-1.5">
+          <Tag className="h-3.5 w-3.5 text-muted-foreground" />
+          <h3 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            Tags
+          </h3>
+        </div>
+        <input
+          type="text"
+          value={form.tags}
+          onChange={(e) => updateField("tags", e.target.value)}
+          className={FORM_INPUT_CLASS}
+          placeholder="react, hooks, state (comma-separated)"
+        />
+      </section>
+    </div>
+  );
+}
+
+/* ── Main Drawer ── */
 
 export function ItemDrawer({
   open,
@@ -159,11 +570,7 @@ export function ItemDrawer({
   const [errors, setErrors] = useState<Record<string, string[]>>({});
 
   const typeName = item?.type.name.toLowerCase() ?? "";
-  const showContent = CONTENT_TYPES.includes(typeName);
-  const showLanguage = LANGUAGE_TYPES.includes(typeName);
-  const showUrl = URL_TYPES.includes(typeName);
   const isFileType = FILE_UPLOAD_TYPES.includes(typeName);
-  const isImageType = typeName === "image";
 
   const handleEdit = () => {
     if (!item) return;
@@ -251,19 +658,9 @@ export function ItemDrawer({
     a.click();
   };
 
-  const formatDate = (date: string | Date) =>
-    new Date(date).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-
   const updateField = (field: keyof EditFormState, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
-
-  const inputClass =
-    "w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring";
 
   return (
     <Sheet open={open} onOpenChange={handleOpenChange}>
@@ -282,7 +679,7 @@ export function ItemDrawer({
                     type="text"
                     value={form.title}
                     onChange={(e) => updateField("title", e.target.value)}
-                    className={`${inputClass} text-lg font-semibold`}
+                    className={`${FORM_INPUT_CLASS} text-lg font-semibold`}
                     placeholder="Title"
                   />
                   {errors.title && (
@@ -306,362 +703,38 @@ export function ItemDrawer({
 
             {/* Action bar */}
             {editing ? (
-              <div className="flex items-center gap-2 border-b border-border px-4 py-2">
-                <button
-                  onClick={handleSave}
-                  disabled={saving || !form.title.trim()}
-                  className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
-                >
-                  {saving ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Save className="h-4 w-4" />
-                  )}
-                  Save
-                </button>
-                <button
-                  onClick={handleCancel}
-                  disabled={saving}
-                  className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted"
-                >
-                  <X className="h-4 w-4" />
-                  Cancel
-                </button>
-              </div>
+              <DrawerEditActions
+                saving={saving}
+                disabled={!form.title.trim()}
+                onSave={handleSave}
+                onCancel={handleCancel}
+              />
             ) : (
-              <div className="flex items-center gap-1 border-b border-border px-4 py-2">
-                <ActionButton
-                  icon={Star}
-                  label="Favorite"
-                  active={item.isFavorite}
-                  activeColor="text-yellow-500"
-                />
-                <ActionButton
-                  icon={Pin}
-                  label="Pin"
-                  active={item.isPinned}
-                  activeColor="text-foreground"
-                />
-                <ActionButton icon={Copy} label="Copy" onClick={handleCopy} />
-                {isFileType && item.fileUrl && (
-                  <ActionButton
-                    icon={Download}
-                    label="Download"
-                    onClick={handleDownload}
-                  />
-                )}
-
-                <div className="ml-auto flex items-center gap-1">
-                  <ActionButton
-                    icon={Pencil}
-                    label="Edit"
-                    onClick={handleEdit}
-                  />
-                  <AlertDialog>
-                    <AlertDialogTrigger
-                      render={
-                        <button className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-sm text-red-400 transition-colors hover:bg-red-500/10">
-                          <Trash2 className="h-4 w-4" />
-                          <span className="hidden sm:inline">Delete</span>
-                        </button>
-                      }
-                    />
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Delete item?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          This will permanently delete &quot;{item.title}&quot;.
-                          This action cannot be undone.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={handleDelete}
-                          disabled={deleting}
-                          className="bg-red-600 hover:bg-red-700"
-                        >
-                          {deleting ? (
-                            <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
-                          ) : null}
-                          Delete
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </div>
-              </div>
+              <DrawerViewActions
+                item={item}
+                isFileType={isFileType}
+                deleting={deleting}
+                onCopy={handleCopy}
+                onDownload={handleDownload}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
             )}
 
             {/* Content area */}
-            <div className="flex-1 space-y-6 overflow-y-auto p-4">
-              {/* Description */}
-              {editing ? (
-                <section>
-                  <h3 className="mb-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                    Description
-                  </h3>
-                  <textarea
-                    value={form.description}
-                    onChange={(e) =>
-                      updateField("description", e.target.value)
-                    }
-                    rows={3}
-                    className={inputClass}
-                    placeholder="Optional description"
-                  />
-                </section>
-              ) : (
-                item.description && (
-                  <section>
-                    <h3 className="mb-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      Description
-                    </h3>
-                    <p className="text-sm leading-relaxed">
-                      {item.description}
-                    </p>
-                  </section>
-                )
-              )}
-
-              {/* Content */}
-              {editing && showContent ? (
-                <section>
-                  <h3 className="mb-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                    Content
-                  </h3>
-                  {showLanguage ? (
-                    <CodeEditor
-                      value={form.content}
-                      onChange={(val) => updateField("content", val)}
-                      language={form.language || undefined}
-                    />
-                  ) : MARKDOWN_TYPES.includes(typeName) ? (
-                    <MarkdownEditor
-                      value={form.content}
-                      onChange={(val) => updateField("content", val)}
-                    />
-                  ) : (
-                    <textarea
-                      value={form.content}
-                      onChange={(e) => updateField("content", e.target.value)}
-                      rows={8}
-                      className={`${inputClass} font-mono`}
-                      placeholder="Content"
-                    />
-                  )}
-                </section>
-              ) : (
-                !editing &&
-                item.content && (
-                  <section>
-                    <h3 className="mb-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      Content
-                    </h3>
-                    {showLanguage ? (
-                      <CodeEditor
-                        value={item.content}
-                        language={item.language ?? undefined}
-                        readOnly
-                      />
-                    ) : MARKDOWN_TYPES.includes(typeName) ? (
-                      <MarkdownEditor value={item.content} readOnly />
-                    ) : (
-                      <pre className="overflow-x-auto rounded-lg border border-border bg-muted/50 p-4 text-sm">
-                        <code>{item.content}</code>
-                      </pre>
-                    )}
-                  </section>
-                )
-              )}
-
-              {/* File preview / info (view only) */}
-              {!editing && isFileType && item.fileUrl && (
-                <section>
-                  <h3 className="mb-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                    {isImageType ? "Image" : "File"}
-                  </h3>
-                  {isImageType ? (
-                    <div className="space-y-2">
-                      <img
-                        src={`/api/files/${item.fileUrl}`}
-                        alt={item.fileName ?? item.title}
-                        className="max-h-64 rounded-md border border-border object-contain"
-                      />
-                      {item.fileName && (
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <span className="truncate">{item.fileName}</span>
-                          {item.fileSize && (
-                            <span className="text-xs text-muted-foreground/60">
-                              {formatFileSize(item.fileSize)}
-                            </span>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-3 rounded-lg border border-border bg-muted/50 p-4">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
-                        <File className="h-5 w-5 text-muted-foreground" />
-                      </div>
-                      <div>
-                        <p className="text-sm">{item.fileName}</p>
-                        {item.fileSize && (
-                          <p className="text-xs text-muted-foreground">
-                            {formatFileSize(item.fileSize)}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </section>
-              )}
-
-              {/* Language */}
-              {editing && showLanguage && (
-                <section>
-                  <h3 className="mb-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                    Language
-                  </h3>
-                  <input
-                    type="text"
-                    value={form.language}
-                    onChange={(e) => updateField("language", e.target.value)}
-                    className={inputClass}
-                    placeholder="e.g. javascript, python"
-                  />
-                </section>
-              )}
-
-              {/* URL */}
-              {editing && showUrl ? (
-                <section>
-                  <h3 className="mb-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                    URL
-                  </h3>
-                  <input
-                    type="text"
-                    value={form.url}
-                    onChange={(e) => updateField("url", e.target.value)}
-                    className={inputClass}
-                    placeholder="https://example.com"
-                  />
-                  {errors.url && (
-                    <p className="mt-1 text-xs text-red-400">
-                      {errors.url[0]}
-                    </p>
-                  )}
-                </section>
-              ) : (
-                !editing &&
-                item.url && (
-                  <section>
-                    <h3 className="mb-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      URL
-                    </h3>
-                    <a
-                      href={item.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="break-all text-sm text-blue-400 hover:underline"
-                    >
-                      {item.url}
-                    </a>
-                  </section>
-                )
-              )}
-
-              {/* Tags */}
-              {editing ? (
-                <section>
-                  <div className="mb-1.5 flex items-center gap-1.5">
-                    <Tag className="h-3.5 w-3.5 text-muted-foreground" />
-                    <h3 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      Tags
-                    </h3>
-                  </div>
-                  <input
-                    type="text"
-                    value={form.tags}
-                    onChange={(e) => updateField("tags", e.target.value)}
-                    className={inputClass}
-                    placeholder="react, hooks, state (comma-separated)"
-                  />
-                </section>
-              ) : (
-                item.tags.length > 0 && (
-                  <section>
-                    <div className="mb-1.5 flex items-center gap-1.5">
-                      <Tag className="h-3.5 w-3.5 text-muted-foreground" />
-                      <h3 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                        Tags
-                      </h3>
-                    </div>
-                    <div className="flex flex-wrap gap-1.5">
-                      {item.tags.map((tag) => (
-                        <span
-                          key={tag.id}
-                          className="rounded-md bg-muted px-2.5 py-1 text-xs text-muted-foreground"
-                        >
-                          {tag.name}
-                        </span>
-                      ))}
-                    </div>
-                  </section>
-                )
-              )}
-
-              {/* Collection (view only) */}
-              {item.collection && (
-                <section>
-                  <div className="mb-1.5 flex items-center gap-1.5">
-                    <FolderOpen className="h-3.5 w-3.5 text-muted-foreground" />
-                    <h3 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      Collections
-                    </h3>
-                  </div>
-                  <span className="text-sm">{item.collection.name}</span>
-                </section>
-              )}
-
-              {/* Details (view only) */}
-              <section>
-                <div className="mb-1.5 flex items-center gap-1.5">
-                  <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
-                  <h3 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                    Details
-                  </h3>
-                </div>
-                <div className="space-y-1 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Created</span>
-                    <span>{formatDate(item.createdAt)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Updated</span>
-                    <span>{formatDate(item.updatedAt)}</span>
-                  </div>
-                </div>
-              </section>
-            </div>
+            {editing ? (
+              <DrawerEditContent
+                form={form}
+                errors={errors}
+                typeName={typeName}
+                updateField={updateField}
+              />
+            ) : (
+              <DrawerViewContent item={item} typeName={typeName} />
+            )}
           </>
         )}
       </SheetContent>
     </Sheet>
-  );
-}
-
-function TypeBadge({ item }: { item: ItemDetail }) {
-  const TypeIcon = getIcon(item.type.icon ?? "file");
-  const color = item.type.color ?? "#6366f1";
-
-  return (
-    <span
-      className="inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs"
-      style={{ backgroundColor: `${color}20`, color }}
-    >
-      <TypeIcon className="h-3 w-3" />
-      {item.type.name}
-    </span>
   );
 }

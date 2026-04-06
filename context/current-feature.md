@@ -6,21 +6,25 @@ In Progress
 
 ## Goals
 
-Fix critical and high-severity issues found during codebase audit.
+Refactor codebase to reduce duplication, break up large files, and extract shared utilities.
 
-### Critical
+### Shared Utilities
 
-1. **Registration server-side validation** — Add Zod schema to `/api/auth/register` for email format, password length (min 8), and confirm match. Currently only checks field presence.
+1. **Extract `formatFileSize`** — Duplicated in FileUpload, FileRow, ItemDrawer. Move to `src/lib/utils.ts`.
+2. **Extract item-type constants** — `CONTENT_TYPES`, `LANGUAGE_TYPES`, `MARKDOWN_TYPES`, `URL_TYPES`, `FILE_UPLOAD_TYPES` duplicated between ItemDrawer and CreateItemDialog. Move to `src/lib/item-constants.ts`.
+3. **Extract Zod field-error helper** — Same 8-line `z.treeifyError` block in createItem and updateItem actions. Extract `extractFieldErrors()`.
+4. **Extract `formatDate` helpers** — Scattered `toLocaleDateString` calls across 4+ components. Centralize as `formatDateShort`/`formatDateLong` in `src/lib/utils.ts`.
+5. **Extract `inputClass` constant** — Same Tailwind string in ItemDrawer and CreateItemDialog. Move to shared constants.
 
-2. **typeId ownership check on item creation** — Verify `typeId` belongs to a system type or the user's own custom type before creating an item. Prevents cross-user type reference.
+### Component Extraction
 
-### High
+6. **Extract `EditorHeader`** — macOS window dots + copy button duplicated between CodeEditor and MarkdownEditor. Shared component with `leftSlot` prop.
+7. **Split `ItemDrawer` (668 lines)** — Extract `DrawerActionBar`, `DrawerViewContent`, `DrawerEditContent`.
+8. **Split `ProfileContent` (319 lines)** — Extract `ChangePasswordForm` and `UsageStats` as separate components.
 
-3. **Cache `getSystemItemTypes` with `React.cache`** — Called in both items layout and page without caching, causing duplicate DB queries per render.
+### Data Layer
 
-4. **Add row limit to `getPinnedItems`** — No `take` clause; unbounded query as pinned items grow.
-
-5. **Use `_count` in `getRecentCollections`** — Currently loads all item rows per collection just to compute `items.length`. Use Prisma `_count` instead.
+9. **Extract `computeCollectionMeta`** — 28-line type-counting block in `getRecentCollections`. Named helper function.
 
 ## Notes
 
