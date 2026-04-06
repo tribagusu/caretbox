@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getItemsByType, getSystemItemTypes } from "@/lib/db/items";
 import { getIcon } from "@/lib/icons";
 import { ItemCard } from "@/components/items/ItemCard";
+import { ImageCard } from "@/components/items/ImageCard";
 import { TypePageHeader } from "@/components/items/TypePageHeader";
 import { auth } from "@/auth";
 
@@ -25,6 +26,7 @@ export default async function ItemsPage({ params }: ItemsPageProps) {
 
   const items = await getItemsByType(userId, itemType.name);
   const TypeIcon = getIcon(itemType.icon ?? "file");
+  const isImageType = itemType.name.toLowerCase() === "image";
 
   return (
     <div className="mx-auto max-w-6xl space-y-6">
@@ -35,10 +37,20 @@ export default async function ItemsPage({ params }: ItemsPageProps) {
       />
 
       {items.length > 0 ? (
-        <div className="grid gap-4 md:grid-cols-2">
-          {items.map((item) => (
-            <ItemCard key={item.id} item={item} />
-          ))}
+        <div
+          className={
+            isImageType
+              ? "grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+              : "grid gap-4 md:grid-cols-2"
+          }
+        >
+          {items.map((item) =>
+            isImageType ? (
+              <ImageCard key={item.id} item={item} />
+            ) : (
+              <ItemCard key={item.id} item={item} />
+            )
+          )}
         </div>
       ) : (
         <div className="rounded-lg border border-dashed border-border py-12 text-center">
