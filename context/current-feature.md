@@ -2,33 +2,15 @@
 
 ## Status
 
-In Progress
+Completed
 
 ## Goals
-
-Refactor codebase to reduce duplication, break up large files, and extract shared utilities.
-
-### Shared Utilities
-
-1. **Extract `formatFileSize`** — Duplicated in FileUpload, FileRow, ItemDrawer. Move to `src/lib/utils.ts`.
-2. **Extract item-type constants** — `CONTENT_TYPES`, `LANGUAGE_TYPES`, `MARKDOWN_TYPES`, `URL_TYPES`, `FILE_UPLOAD_TYPES` duplicated between ItemDrawer and CreateItemDialog. Move to `src/lib/item-constants.ts`.
-3. **Extract Zod field-error helper** — Same 8-line `z.treeifyError` block in createItem and updateItem actions. Extract `extractFieldErrors()`.
-4. **Extract `formatDate` helpers** — Scattered `toLocaleDateString` calls across 4+ components. Centralize as `formatDateShort`/`formatDateLong` in `src/lib/utils.ts`.
-5. **Extract `inputClass` constant** — Same Tailwind string in ItemDrawer and CreateItemDialog. Move to shared constants.
-
-### Component Extraction
-
-6. **Extract `EditorHeader`** — macOS window dots + copy button duplicated between CodeEditor and MarkdownEditor. Shared component with `leftSlot` prop.
-7. **Split `ItemDrawer` (668 lines)** — Extract `DrawerActionBar`, `DrawerViewContent`, `DrawerEditContent`.
-8. **Split `ProfileContent` (319 lines)** — Extract `ChangePasswordForm` and `UsageStats` as separate components.
-
-### Data Layer
-
-9. **Extract `computeCollectionMeta`** — 28-line type-counting block in `getRecentCollections`. Named helper function.
 
 ## Notes
 
 ## History
+
+- **2026-04-06** — Codebase Audit Fixes + Refactor: Fixed critical/high audit findings: Zod validation on registration route (email format, password min 8), typeId ownership check on item creation, React.cache on getSystemItemTypes, take:20 limit on getPinnedItems, Prisma _count in getRecentCollections. Then refactored codebase: extracted formatFileSize/formatDateShort/formatDateLong to src/lib/utils.ts, item-type constants + FORM_INPUT_CLASS to src/lib/item-constants.ts, extractFieldErrors helper in actions/items.ts, EditorHeader shared component (macOS dots + copy button used by CodeEditor + MarkdownEditor), split ItemDrawer (668 lines) into DrawerEditActions/DrawerViewActions/DrawerViewContent/DrawerEditContent subcomponents, split ProfileContent (319 lines) into ChangePasswordForm + UsageStats components, extracted computeCollectionMeta helper in collections.ts. New files: src/lib/item-constants.ts, src/components/items/EditorHeader.tsx, src/components/profile/ChangePasswordForm.tsx, src/components/profile/UsageStats.tsx. Updated: 13 existing files across utils, actions, components, and data layers.
 
 - **2026-04-06** — File List View: Added FileRow component (src/components/items/FileRow.tsx) with single-column list layout for /items/file page (Google Drive/Dropbox style). Each row shows file icon by extension (FileImage, FileText, FileCode, FileSpreadsheet, or generic File), file name, file size (formatted as B/KB/MB), upload date, and download button with stopPropagation. Row click opens ItemDrawer. Hover highlight via hover:bg-muted/50. Responsive: size and date stack below name on mobile, shown inline on sm+. Added fileName/fileSize to DashboardItem interface and mapItem function. /items/file page uses flex-col layout with FileRow; image and other types unchanged. New files: src/components/items/FileRow.tsx. Updated: src/app/items/[type]/page.tsx, src/lib/db/items.ts.
 
