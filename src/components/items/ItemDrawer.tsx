@@ -19,6 +19,8 @@ import {
   Save,
   X,
   Loader2,
+  Download,
+  File,
 } from "lucide-react";
 import { getIcon } from "@/lib/icons";
 import { CodeEditor } from "@/components/items/CodeEditor";
@@ -106,6 +108,13 @@ const CONTENT_TYPES = ["snippet", "prompt", "command", "note"];
 const LANGUAGE_TYPES = ["snippet", "command"];
 const MARKDOWN_TYPES = ["note", "prompt"];
 const URL_TYPES = ["link"];
+const FILE_UPLOAD_TYPES = ["file", "image"];
+
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
 
 interface EditFormState {
   title: string;
@@ -153,6 +162,8 @@ export function ItemDrawer({
   const showContent = CONTENT_TYPES.includes(typeName);
   const showLanguage = LANGUAGE_TYPES.includes(typeName);
   const showUrl = URL_TYPES.includes(typeName);
+  const isFileType = FILE_UPLOAD_TYPES.includes(typeName);
+  const isImageType = typeName === "image";
 
   const handleEdit = () => {
     if (!item) return;
@@ -230,6 +241,14 @@ export function ItemDrawer({
   const handleCopy = () => {
     if (!item?.content) return;
     navigator.clipboard.writeText(item.content);
+  };
+
+  const handleDownload = () => {
+    if (!item?.fileUrl) return;
+    const a = document.createElement("a");
+    a.href = `/api/files/${item.fileUrl}`;
+    a.download = item.fileName ?? "download";
+    a.click();
   };
 
   const formatDate = (date: string | Date) =>
@@ -324,6 +343,13 @@ export function ItemDrawer({
                   activeColor="text-foreground"
                 />
                 <ActionButton icon={Copy} label="Copy" onClick={handleCopy} />
+                {isFileType && item.fileUrl && (
+                  <ActionButton
+                    icon={Download}
+                    label="Download"
+                    onClick={handleDownload}
+                  />
+                )}
 
                 <div className="ml-auto flex items-center gap-1">
                   <ActionButton
@@ -447,6 +473,48 @@ export function ItemDrawer({
                     )}
                   </section>
                 )
+              )}
+
+              {/* File preview / info (view only) */}
+              {!editing && isFileType && item.fileUrl && (
+                <section>
+                  <h3 className="mb-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                    {isImageType ? "Image" : "File"}
+                  </h3>
+                  {isImageType ? (
+                    <div className="space-y-2">
+                      <img
+                        src={`/api/files/${item.fileUrl}`}
+                        alt={item.fileName ?? item.title}
+                        className="max-h-64 rounded-md border border-border object-contain"
+                      />
+                      {item.fileName && (
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <span className="truncate">{item.fileName}</span>
+                          {item.fileSize && (
+                            <span className="text-xs text-muted-foreground/60">
+                              {formatFileSize(item.fileSize)}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-3 rounded-lg border border-border bg-muted/50 p-4">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+                        <File className="h-5 w-5 text-muted-foreground" />
+                      </div>
+                      <div>
+                        <p className="text-sm">{item.fileName}</p>
+                        {item.fileSize && (
+                          <p className="text-xs text-muted-foreground">
+                            {formatFileSize(item.fileSize)}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </section>
               )}
 
               {/* Language */}

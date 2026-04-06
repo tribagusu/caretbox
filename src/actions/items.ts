@@ -12,6 +12,10 @@ const createItemSchema = z.object({
   title: z.string().trim().min(1, "Title is required"),
   description: z.string().trim().nullable().optional().default(null),
   content: z.string().nullable().optional().default(null),
+  contentType: z.enum(["text", "file"]).default("text"),
+  fileUrl: z.string().nullable().optional().default(null),
+  fileName: z.string().nullable().optional().default(null),
+  fileSize: z.number().int().positive().nullable().optional().default(null),
   url: z
     .union([z.url("Must be a valid URL"), z.literal("")])
     .nullable()
@@ -49,6 +53,10 @@ export async function createItem(data: CreateItemInput) {
     title: parsed.data.title,
     description: parsed.data.description ?? null,
     content: parsed.data.content ?? null,
+    contentType: parsed.data.contentType,
+    fileUrl: parsed.data.fileUrl ?? null,
+    fileName: parsed.data.fileName ?? null,
+    fileSize: parsed.data.fileSize ?? null,
     url: parsed.data.url ?? null,
     language: parsed.data.language ?? null,
     typeId: parsed.data.typeId,

@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { deleteFromR2 } from "@/lib/r2";
 
 export interface DashboardItem {
   id: string;
@@ -99,6 +100,9 @@ export interface ItemDetail {
   description: string | null;
   content: string | null;
   contentType: string;
+  fileUrl: string | null;
+  fileName: string | null;
+  fileSize: number | null;
   url: string | null;
   language: string | null;
   isFavorite: boolean;
@@ -135,6 +139,9 @@ export async function getItemById(
     description: item.description,
     content: item.content,
     contentType: item.contentType,
+    fileUrl: item.fileUrl,
+    fileName: item.fileName,
+    fileSize: item.fileSize,
     url: item.url,
     language: item.language,
     isFavorite: item.isFavorite,
@@ -203,6 +210,9 @@ export async function updateItem(
     description: updated.description,
     content: updated.content,
     contentType: updated.contentType,
+    fileUrl: updated.fileUrl,
+    fileName: updated.fileName,
+    fileSize: updated.fileSize,
     url: updated.url,
     language: updated.language,
     isFavorite: updated.isFavorite,
@@ -219,6 +229,10 @@ export interface CreateItemData {
   title: string;
   description: string | null;
   content: string | null;
+  contentType: string;
+  fileUrl: string | null;
+  fileName: string | null;
+  fileSize: number | null;
   url: string | null;
   language: string | null;
   typeId: string;
@@ -234,7 +248,10 @@ export async function createItem(
       title: data.title,
       description: data.description,
       content: data.content,
-      contentType: "text",
+      contentType: data.contentType,
+      fileUrl: data.fileUrl,
+      fileName: data.fileName,
+      fileSize: data.fileSize,
       url: data.url,
       language: data.language,
       userId,
@@ -263,6 +280,9 @@ export async function createItem(
     description: created.description,
     content: created.content,
     contentType: created.contentType,
+    fileUrl: created.fileUrl,
+    fileName: created.fileName,
+    fileSize: created.fileSize,
     url: created.url,
     language: created.language,
     isFavorite: created.isFavorite,
@@ -278,12 +298,22 @@ export async function createItem(
 export async function deleteItem(userId: string, id: string): Promise<boolean> {
   const item = await prisma.item.findUnique({
     where: { id, userId },
-    select: { id: true },
+    select: { id: true, fileUrl: true },
   });
 
   if (!item) return false;
 
   await prisma.item.delete({ where: { id } });
+
+  if (item.fileUrl) {
+    try {
+      await deleteFromR2(item.fileUrl);
+    } catch {
+      // Log but don't fail — orphaned R2 objects are harmless
+      console.error(`Failed to delete R2 object: ${item.fileUrl}`);
+    }
+  }
+
   return true;
 }
 

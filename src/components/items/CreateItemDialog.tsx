@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { CodeEditor } from "@/components/items/CodeEditor";
 import { MarkdownEditor } from "@/components/items/MarkdownEditor";
+import { FileUpload } from "@/components/items/FileUpload";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { createItem } from "@/actions/items";
@@ -27,6 +28,8 @@ const CONTENT_TYPES = ["snippet", "prompt", "command", "note"];
 const LANGUAGE_TYPES = ["snippet", "command"];
 const MARKDOWN_TYPES = ["note", "prompt"];
 const URL_TYPES = ["link"];
+const FILE_TYPES = ["file"];
+const IMAGE_TYPES = ["image"];
 
 interface FormState {
   title: string;
@@ -36,6 +39,9 @@ interface FormState {
   url: string;
   tags: string;
   typeId: string;
+  fileUrl: string;
+  fileName: string;
+  fileSize: number | null;
 }
 
 const initialForm: FormState = {
@@ -46,6 +52,9 @@ const initialForm: FormState = {
   url: "",
   tags: "",
   typeId: "",
+  fileUrl: "",
+  fileName: "",
+  fileSize: null,
 };
 
 export function CreateItemDialog({
@@ -67,6 +76,9 @@ export function CreateItemDialog({
   const showContent = CONTENT_TYPES.includes(typeName);
   const showLanguage = LANGUAGE_TYPES.includes(typeName);
   const showUrl = URL_TYPES.includes(typeName);
+  const showFile = FILE_TYPES.includes(typeName);
+  const showImage = IMAGE_TYPES.includes(typeName);
+  const needsFile = showFile || showImage;
 
   const handleOpenChange = (value: boolean) => {
     if (!value) {
@@ -94,6 +106,10 @@ export function CreateItemDialog({
       title: form.title,
       description: form.description || null,
       content: form.content || null,
+      contentType: needsFile ? "file" : "text",
+      fileUrl: form.fileUrl || null,
+      fileName: form.fileName || null,
+      fileSize: form.fileSize,
       language: form.language || null,
       url: form.url || null,
       typeId: form.typeId,
@@ -235,6 +251,22 @@ export function CreateItemDialog({
             </div>
           )}
 
+          {/* File upload (file, image) */}
+          {needsFile && (
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium">
+                {showImage ? "Image" : "File"}
+              </label>
+              <FileUpload
+                isImage={showImage}
+                onUploadComplete={({ fileUrl, fileName, fileSize }) => {
+                  setForm((prev) => ({ ...prev, fileUrl, fileName, fileSize }));
+                }}
+                onUploadError={(error) => toast.error(error)}
+              />
+            </div>
+          )}
+
           {/* Tags */}
           <div className="space-y-1.5">
             <label className="text-sm font-medium">Tags</label>
@@ -259,7 +291,12 @@ export function CreateItemDialog({
             </Button>
             <Button
               type="submit"
-              disabled={saving || !form.title.trim() || !form.typeId}
+              disabled={
+                saving ||
+                !form.title.trim() ||
+                !form.typeId ||
+                (needsFile && !form.fileUrl)
+              }
             >
               {saving && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
               Create

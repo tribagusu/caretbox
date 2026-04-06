@@ -120,10 +120,44 @@ describe("createItem", () => {
       title: "New Snippet",
       description: "A snippet",
       content: "console.log('hello')",
+      contentType: "text",
+      fileUrl: null,
+      fileName: null,
+      fileSize: null,
       url: null,
       language: "javascript",
       typeId: "type-1",
       tags: ["react", "hooks"],
+    });
+  });
+
+  it("creates file item with file fields", async () => {
+    mockAuth.mockResolvedValue({ user: { id: "user-1" } });
+    mockCreateItemQuery.mockResolvedValue(fakeItem);
+
+    const result = await createItem({
+      title: "My PDF",
+      typeId: "type-file",
+      contentType: "file",
+      fileUrl: "uploads/user-1/123-doc.pdf",
+      fileName: "doc.pdf",
+      fileSize: 2048,
+      tags: [],
+    });
+
+    expect(result.success).toBe(true);
+    expect(mockCreateItemQuery).toHaveBeenCalledWith("user-1", {
+      title: "My PDF",
+      description: null,
+      content: null,
+      contentType: "file",
+      fileUrl: "uploads/user-1/123-doc.pdf",
+      fileName: "doc.pdf",
+      fileSize: 2048,
+      url: null,
+      language: null,
+      typeId: "type-file",
+      tags: [],
     });
   });
 
