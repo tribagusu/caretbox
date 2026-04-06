@@ -8,6 +8,8 @@ export interface DashboardItem {
   isFavorite: boolean;
   isPinned: boolean;
   fileUrl: string | null;
+  fileName: string | null;
+  fileSize: number | null;
   createdAt: Date;
   type: {
     name: string;
@@ -36,6 +38,8 @@ function mapItem(
     isFavorite: item.isFavorite,
     isPinned: item.isPinned,
     fileUrl: item.fileUrl,
+    fileName: item.fileName,
+    fileSize: item.fileSize,
     createdAt: item.createdAt,
     type: item.type,
     tags: item.tags.map((t) => t.tag),

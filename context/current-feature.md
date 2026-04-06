@@ -10,6 +10,9 @@ Completed
 
 ## History
 
+- **2026-04-06** — File List View: Added FileRow component (src/components/items/FileRow.tsx) with single-column list layout for /items/file page (Google Drive/Dropbox style). Each row shows file icon by extension (FileImage, FileText, FileCode, FileSpreadsheet, or generic File), file name, file size (formatted as B/KB/MB), upload date, and download button with stopPropagation. Row click opens ItemDrawer. Hover highlight via hover:bg-muted/50. Responsive: size and date stack below name on mobile, shown inline on sm+. Added fileName/fileSize to DashboardItem interface and mapItem function. /items/file page uses flex-col layout with FileRow; image and other types unchanged. New files: src/components/items/FileRow.tsx. Updated: src/app/items/[type]/page.tsx, src/lib/db/items.ts.
+
+
 - **2026-04-06** — Image Gallery View: Added ImageCard component (src/components/items/ImageCard.tsx) with 16:9 aspect-video thumbnail, object-cover fill, hover zoom effect (5% scale, 300ms transition), pin/favorite badges overlaid on thumbnail, title and tags below. /items/image page uses 3-column grid (sm:grid-cols-2 lg:grid-cols-3) with ImageCard instead of regular ItemCard. Added fileUrl to DashboardItem interface and mapItem function. Other item types unchanged. New files: src/components/items/ImageCard.tsx. Updated: src/app/items/[type]/page.tsx, src/lib/db/items.ts.
 
 
