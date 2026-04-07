@@ -1,30 +1,16 @@
-# Current Feature: Collection Create
+# Current Feature
 
 ## Status
 
-In Progress
+Completed
 
 ## Goals
 
-- "New Collection" button in TopBar opens a shadcn Dialog modal
-- Modal fields: name (required), description (optional)
-- Server action `createCollection()` in `src/actions/collections.ts` with Zod validation and auth check
-- Query function `createCollection()` in `src/lib/db/collections.ts` creates collection for the authenticated user
-- Toast on success/error, modal closes and page refreshes on success
-- Follow existing item create patterns (CreateItemDialog, actions/items.ts, lib/db/items.ts)
-- New file: `src/components/collections/CreateCollectionDialog.tsx`
-- New file: `src/actions/collections.ts`
-- TopBar updated to show "New Collection" button alongside "New Item"
-- Dashboard and sidebar reflect new collection immediately via `router.refresh()`
-
 ## Notes
 
-- Collections are user-scoped (userId from session)
-- isFavorite defaults to false on create
-- Reuse existing shadcn Dialog component
-- Keep modal simple — just name and description for now
-
 ## History
+
+- **2026-04-07** — Collection Create: Added "New Collection" button (FolderPlus icon) in TopBar alongside "New Item". Opens CreateCollectionDialog (shadcn Dialog) with name (required) and description (optional) fields. Server action createCollection() in src/actions/collections.ts with Zod validation and auth check. Query function createCollection() in src/lib/db/collections.ts creates user-scoped collection via Prisma. Toast on success/error, modal closes and router.refresh() updates dashboard/sidebar. New files: src/actions/collections.ts, src/components/collections/CreateCollectionDialog.tsx. Updated: src/lib/db/collections.ts, src/components/dashboard/TopBar.tsx.
 
 - **2026-04-06** — Codebase Audit Fixes + Refactor: Fixed critical/high audit findings: Zod validation on registration route (email format, password min 8), typeId ownership check on item creation, React.cache on getSystemItemTypes, take:20 limit on getPinnedItems, Prisma _count in getRecentCollections. Then refactored codebase: extracted formatFileSize/formatDateShort/formatDateLong to src/lib/utils.ts, item-type constants + FORM_INPUT_CLASS to src/lib/item-constants.ts, extractFieldErrors helper in actions/items.ts, EditorHeader shared component (macOS dots + copy button used by CodeEditor + MarkdownEditor), split ItemDrawer (668 lines) into DrawerEditActions/DrawerViewActions/DrawerViewContent/DrawerEditContent subcomponents, split ProfileContent (319 lines) into ChangePasswordForm + UsageStats components, extracted computeCollectionMeta helper in collections.ts. New files: src/lib/item-constants.ts, src/components/items/EditorHeader.tsx, src/components/profile/ChangePasswordForm.tsx, src/components/profile/UsageStats.tsx. Updated: 13 existing files across utils, actions, components, and data layers.
 
