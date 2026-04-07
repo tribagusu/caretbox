@@ -1,12 +1,28 @@
-# Current Feature
+# Current Feature: Collection Create
 
 ## Status
 
-Completed
+In Progress
 
 ## Goals
 
+- "New Collection" button in TopBar opens a shadcn Dialog modal
+- Modal fields: name (required), description (optional)
+- Server action `createCollection()` in `src/actions/collections.ts` with Zod validation and auth check
+- Query function `createCollection()` in `src/lib/db/collections.ts` creates collection for the authenticated user
+- Toast on success/error, modal closes and page refreshes on success
+- Follow existing item create patterns (CreateItemDialog, actions/items.ts, lib/db/items.ts)
+- New file: `src/components/collections/CreateCollectionDialog.tsx`
+- New file: `src/actions/collections.ts`
+- TopBar updated to show "New Collection" button alongside "New Item"
+- Dashboard and sidebar reflect new collection immediately via `router.refresh()`
+
 ## Notes
+
+- Collections are user-scoped (userId from session)
+- isFavorite defaults to false on create
+- Reuse existing shadcn Dialog component
+- Keep modal simple — just name and description for now
 
 ## History
 

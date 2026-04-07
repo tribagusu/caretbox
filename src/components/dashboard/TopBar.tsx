@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Plus, PanelLeft } from "lucide-react";
+import { Search, Plus, FolderPlus, PanelLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/dashboard/SidebarContext";
 import { CreateItemDialog } from "@/components/items/CreateItemDialog";
+import { CreateCollectionDialog } from "@/components/collections/CreateCollectionDialog";
 import type { SidebarItemType } from "@/lib/db/items";
 
 interface TopBarProps {
@@ -14,7 +15,8 @@ interface TopBarProps {
 
 export function TopBar({ itemTypes = [] }: TopBarProps) {
   const { toggleSidebar, openMobile } = useSidebar();
-  const [createOpen, setCreateOpen] = useState(false);
+  const [createItemOpen, setCreateItemOpen] = useState(false);
+  const [createCollectionOpen, setCreateCollectionOpen] = useState(false);
 
   return (
     <header className="flex h-14 items-center justify-between border-b border-border px-4">
@@ -58,17 +60,30 @@ export function TopBar({ itemTypes = [] }: TopBarProps) {
           variant="outline"
           size="sm"
           className="h-8 text-xs"
-          onClick={() => setCreateOpen(true)}
+          onClick={() => setCreateItemOpen(true)}
         >
           <Plus className="mr-1 h-3.5 w-3.5" />
           New Item
         </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-8 text-xs"
+          onClick={() => setCreateCollectionOpen(true)}
+        >
+          <FolderPlus className="mr-1 h-3.5 w-3.5" />
+          New Collection
+        </Button>
       </div>
 
       <CreateItemDialog
-        open={createOpen}
-        onOpenChange={setCreateOpen}
+        open={createItemOpen}
+        onOpenChange={setCreateItemOpen}
         itemTypes={itemTypes}
+      />
+      <CreateCollectionDialog
+        open={createCollectionOpen}
+        onOpenChange={setCreateCollectionOpen}
       />
     </header>
   );

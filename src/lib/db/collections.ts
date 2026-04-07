@@ -87,6 +87,22 @@ export const getRecentCollections = cache(async function getRecentCollections(us
   });
 });
 
+export interface CreateCollectionData {
+  name: string;
+  description: string | null;
+}
+
+export async function createCollection(userId: string, data: CreateCollectionData) {
+  return prisma.collection.create({
+    data: {
+      name: data.name,
+      description: data.description,
+      userId,
+    },
+    select: { id: true, name: true },
+  });
+}
+
 export async function getCollectionStats(userId: string) {
   const [totalCollections, favoriteCollections] = await Promise.all([
     prisma.collection.count({ where: { userId } }),
