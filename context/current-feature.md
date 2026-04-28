@@ -1,8 +1,24 @@
-# Current Feature
+# Current Feature: Google OAuth + Hide Email Auth
 
 ## Status
 
-Completed
+In Progress
+
+## Goals
+
+- Add Google OAuth provider to NextAuth alongside existing GitHub OAuth
+- Hide email/password sign-in form and registration form from the UI (credentials provider stays in backend but is not exposed)
+- Update sign-in page to show only Google and GitHub OAuth buttons
+- Remove or hide the "Forgot password?" link and register page link from sign-in UI
+- Register page should redirect to sign-in (or be inaccessible via UI navigation)
+- Forgot password and reset password pages remain but are not linked from the UI
+
+## Notes
+
+- Resend (email service) is not active, so email-based flows (registration, forgot password, verification) cannot be used
+- Credentials provider should be kept in NextAuth config (not deleted) so existing seeded/demo users still work in dev if needed — just hidden from UI
+- Google OAuth requires GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET env vars
+- NextAuth v5 (beta) is in use — use the same provider pattern as GitHub OAuth already set up in auth.config.ts
 
 ## Goals
 
