@@ -9,7 +9,7 @@ export default function RegisterPage() {
             Create your account
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Get started with Conot
+            Get started with Caretbox
           </p>
         </div>
 

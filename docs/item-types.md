@@ -1,6 +1,6 @@
 # Item Types
 
-Conot has 7 system (built-in) item types. Pro users can create custom types.
+Caretbox has 7 system (built-in) item types. Pro users can create custom types.
 
 ---
 

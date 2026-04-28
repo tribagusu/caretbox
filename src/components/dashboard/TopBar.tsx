@@ -39,7 +39,7 @@ export function TopBar({ itemTypes = [] }: TopBarProps) {
           <div className="flex h-7 w-7 items-center justify-center rounded-md bg-blue-600 text-xs font-bold text-white">
             C
           </div>
-          <span className="text-sm font-semibold">Conot</span>
+          <span className="text-sm font-semibold">Caretbox</span>
         </div>
       </div>
 

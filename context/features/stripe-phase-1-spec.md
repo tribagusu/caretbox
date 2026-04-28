@@ -6,7 +6,7 @@ Set up Stripe SDK, usage limit utilities, session/auth changes for `isPro`, chec
 
 ## Prerequisites
 
-- Stripe Dashboard configured with Conot Pro product, monthly ($8) and yearly ($72) prices
+- Stripe Dashboard configured with Caretbox Pro product, monthly ($8) and yearly ($72) prices
 - Environment variables set: `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_ID_MONTHLY`, `STRIPE_PRICE_ID_YEARLY`
 - Database already has `isPro`, `stripeCustomerId`, `stripeSubscriptionId` fields on User model
 

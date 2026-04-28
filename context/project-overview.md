@@ -1,10 +1,10 @@
-## Conot Project Specifications
+## Caretbox Project Specifications
 
 🚀 Centralized Developer Knowledge Hub
 
 ---
 
-## Conot Project Specifications
+## Caretbox Project Specifications
 
 🚀 **Centralized Developer Knowledge Hub** for code snippets, AI prompts, docs, commands & more.
 
@@ -25,7 +25,7 @@ Developers keep their essentials scattered:
 
 This creates **context switching, lost knowledge** and **inconsistent workflows**.
 
-➡️ **Conot provides ONE searchable, AI‑enhanced hub for all dev knowledge & resources.**
+➡️ **Caretbox provides ONE searchable, AI‑enhanced hub for all dev knowledge & resources.**
 
 ---
 
@@ -342,4 +342,4 @@ git switch -c lesson-01-setup
 
 ---
 
-🏗️ **Conot — Store Smarter. Build Faster.**
+🏗️ **Caretbox — Store Smarter. Build Faster.**
