@@ -38,7 +38,7 @@ export function TopBar({ itemTypes = [] }: TopBarProps) {
         </Button>
         <div className="flex items-center gap-2">
           <Image
-            src="/caretbox-logo.png"
+            src="/caretbox-logo-w.png"
             alt="Caretbox"
             width={28}
             height={28}
