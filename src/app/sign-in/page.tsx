@@ -10,7 +10,7 @@ export default function SignInPage() {
             Sign in to Caretbox
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Your developer knowledge hub
+            One box for all your dev brain
           </p>
         </div>
 

@@ -50,7 +50,7 @@ export function SignInForm() {
 
       <Button
         variant="outline"
-        className="w-full"
+        className="w-full h-12 text-base cursor-pointer"
         onClick={() => signIn("google", { callbackUrl })}
       >
         <GoogleIcon />
@@ -59,7 +59,7 @@ export function SignInForm() {
 
       <Button
         variant="outline"
-        className="w-full"
+        className="w-full h-12 text-base cursor-pointer"
         onClick={() => signIn("github", { callbackUrl })}
       >
         <GitHubIcon />
