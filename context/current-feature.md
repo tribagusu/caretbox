@@ -1,30 +1,16 @@
-# Current Feature: Google OAuth + Hide Email Auth
+# Current Feature
 
 ## Status
 
-In Progress
-
-## Goals
-
-- Add Google OAuth provider to NextAuth alongside existing GitHub OAuth
-- Hide email/password sign-in form and registration form from the UI (credentials provider stays in backend but is not exposed)
-- Update sign-in page to show only Google and GitHub OAuth buttons
-- Remove or hide the "Forgot password?" link and register page link from sign-in UI
-- Register page should redirect to sign-in (or be inaccessible via UI navigation)
-- Forgot password and reset password pages remain but are not linked from the UI
-
-## Notes
-
-- Resend (email service) is not active, so email-based flows (registration, forgot password, verification) cannot be used
-- Credentials provider should be kept in NextAuth config (not deleted) so existing seeded/demo users still work in dev if needed — just hidden from UI
-- Google OAuth requires GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET env vars
-- NextAuth v5 (beta) is in use — use the same provider pattern as GitHub OAuth already set up in auth.config.ts
+Completed
 
 ## Goals
 
 ## Notes
 
 ## History
+
+- **2026-04-28** — Google OAuth + Hide Email Auth: Added Google OAuth provider to NextAuth (src/auth.config.ts) with allowDangerousEmailAccountLinking so users with an existing GitHub account can also sign in with Google using the same email. Replaced email/password SignInForm with OAuth-only UI showing Google and GitHub buttons (inline SVG icons to avoid deprecated lucide-react Github alias). Register page now redirects to /sign-in. Env vars required: AUTH_GOOGLE_ID and AUTH_GOOGLE_SECRET (NextAuth v5 AUTH_ prefix convention).
 
 - **2026-04-07** — Collection Create: Added "New Collection" button (FolderPlus icon) in TopBar alongside "New Item". Opens CreateCollectionDialog (shadcn Dialog) with name (required) and description (optional) fields. Server action createCollection() in src/actions/collections.ts with Zod validation and auth check. Query function createCollection() in src/lib/db/collections.ts creates user-scoped collection via Prisma. Toast on success/error, modal closes and router.refresh() updates dashboard/sidebar. New files: src/actions/collections.ts, src/components/collections/CreateCollectionDialog.tsx. Updated: src/lib/db/collections.ts, src/components/dashboard/TopBar.tsx.
 
