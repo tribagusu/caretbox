@@ -2,6 +2,7 @@
   "name": "caretbox",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@10.30.3",
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
@@ -57,5 +58,15 @@
     "tsx": "4.21.0",
     "typescript": "5.9.3",
     "vitest": "4.1.2"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@prisma/engines",
+      "esbuild",
+      "msw",
+      "prisma",
+      "sharp",
+      "unrs-resolver"
+    ]
   }
 }
