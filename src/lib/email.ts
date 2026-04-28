@@ -8,9 +8,9 @@ export async function sendPasswordResetEmail(email: string, token: string) {
   const resetUrl = `${APP_URL}/reset-password?token=${token}`;
 
   await resend.emails.send({
-    from: "DevStash <onboarding@resend.dev>",
+    from: "Conot <onboarding@resend.dev>",
     to: email,
-    subject: "Reset your password - DevStash",
+    subject: "Reset your password - Conot",
     html: `
       <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 24px;">
         <h2 style="color: #f5f5f5; margin-bottom: 16px;">Reset your password</h2>
@@ -38,12 +38,12 @@ export async function sendVerificationEmail(email: string, token: string) {
   const verifyUrl = `${APP_URL}/verify-email?token=${token}`;
 
   await resend.emails.send({
-    from: "DevStash <onboarding@resend.dev>",
+    from: "Conot <onboarding@resend.dev>",
     to: email,
-    subject: "Verify your email - DevStash",
+    subject: "Verify your email - Conot",
     html: `
       <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 24px;">
-        <h2 style="color: #f5f5f5; margin-bottom: 16px;">Welcome to DevStash</h2>
+        <h2 style="color: #f5f5f5; margin-bottom: 16px;">Welcome to Conot</h2>
         <p style="color: #a1a1aa; line-height: 1.6;">
           Click the button below to verify your email address and activate your account.
         </p>

@@ -7,7 +7,7 @@ const adapter = new PrismaPg({
 });
 const prisma = new PrismaClient({ adapter });
 
-const KEEP_EMAIL = "demo@devstash.io";
+const KEEP_EMAIL = "demo@conot.io";
 
 async function main() {
   const users = await prisma.user.findMany({

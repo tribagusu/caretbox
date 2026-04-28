@@ -1,10 +1,10 @@
-## DevStash Project Specifications
+## Conot Project Specifications
 
 🚀 Centralized Developer Knowledge Hub
 
 ---
 
-## DevStash Project Specifications
+## Conot Project Specifications
 
 🚀 **Centralized Developer Knowledge Hub** for code snippets, AI prompts, docs, commands & more.
 
@@ -25,7 +25,7 @@ Developers keep their essentials scattered:
 
 This creates **context switching, lost knowledge** and **inconsistent workflows**.
 
-➡️ **DevStash provides ONE searchable, AI‑enhanced hub for all dev knowledge & resources.**
+➡️ **Conot provides ONE searchable, AI‑enhanced hub for all dev knowledge & resources.**
 
 ---
 
@@ -342,4 +342,4 @@ git switch -c lesson-01-setup
 
 ---
 
-🏗️ **DevStash — Store Smarter. Build Faster.**
+🏗️ **Conot — Store Smarter. Build Faster.**

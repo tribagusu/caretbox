@@ -37,9 +37,9 @@ export function TopBar({ itemTypes = [] }: TopBarProps) {
         </Button>
         <div className="flex items-center gap-2">
           <div className="flex h-7 w-7 items-center justify-center rounded-md bg-blue-600 text-xs font-bold text-white">
-            D
+            C
           </div>
-          <span className="text-sm font-semibold">DevStash</span>
+          <span className="text-sm font-semibold">Conot</span>
         </div>
       </div>
 

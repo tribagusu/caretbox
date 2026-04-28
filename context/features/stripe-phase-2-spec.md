@@ -113,7 +113,7 @@ Client component (`'use client'`) that displays:
 After successful checkout, users redirect to `/settings?upgraded=true`. Handle this in BillingSettings or a wrapper:
 
 - Read `upgraded` param with `useSearchParams()`
-- On mount, if `upgraded === 'true'`, show `toast.success('Welcome to DevStash Pro!')`
+- On mount, if `upgraded === 'true'`, show `toast.success('Welcome to Conot Pro!')`
 - Clean up URL with `window.history.replaceState({}, '', '/settings')`
 
 ## New Files

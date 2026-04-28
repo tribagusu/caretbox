@@ -1,6 +1,6 @@
 # Item Types
 
-DevStash has 7 system (built-in) item types. Pro users can create custom types.
+Conot has 7 system (built-in) item types. Pro users can create custom types.
 
 ---
 
