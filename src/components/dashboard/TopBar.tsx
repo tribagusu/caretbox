@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Search, Plus, FolderPlus, PanelLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -36,9 +37,13 @@ export function TopBar({ itemTypes = [] }: TopBarProps) {
           <PanelLeft className="h-4 w-4" />
         </Button>
         <div className="flex items-center gap-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-md bg-blue-600 text-xs font-bold text-white">
-            C
-          </div>
+          <Image
+            src="/caretbox-logo.png"
+            alt="Caretbox"
+            width={28}
+            height={28}
+            className="invert"
+          />
           <span className="text-sm font-semibold">Caretbox</span>
         </div>
       </div>
